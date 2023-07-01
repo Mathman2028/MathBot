@@ -1,0 +1,30 @@
+{
+  "Symbols": {
+    "first": {
+      "name": "The Beginning",
+      "desc": "Get your first symbols"
+    },
+    "bonus_unlock": {
+      "name": "Endpoint",
+      "desc": "Get your first bonus unlock"
+    },
+    "craft": {
+      "name": "Crafter",
+      "desc": "Craft a symbol using what you have now"
+    },
+    "nofriends": {
+      "name": "Introvert",
+      "desc": "Attempt to trade yourself"
+    },
+    "donate": {
+      "name": "Generous",
+      "desc": "Donate a symbol to someone"
+    }
+  },
+  "Random": {
+    "nope": {
+      "name": "Nope",
+      "desc": "Try to interact with something you can't interact with"
+    }
+  }
+}
