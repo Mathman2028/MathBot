@@ -546,10 +546,12 @@ class Achievements(commands.Cog):
     @classmethod
     async def give_ach(cls, guild, member, category, ach, messageable):
         Achievements.register(guild, member)
+        new_ach = not Achievements.has_ach(guild, member, ach)
         Database.get_member(guild, member)["achs"][ach] = True
         Database.save()
         ach_data = Achievements.achievements[category][ach]
-        await messageable.send(embed=discord.Embed(color=discord.Color.brand_green(), title=ach_data["name"], description=ach_data["desc"]))
+        if new_ach:
+            await messageable.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Achievement get: " + ach_data["name"], description=ach_data["desc"]))
     @commands.hybrid_command(brief="See your achievements", help="Lists your achievements by category")
     async def achs(self, ctx):
         Achievements.register(ctx.guild, ctx.author)
