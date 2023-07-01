@@ -150,6 +150,8 @@ async def easter_eggs(message):
         if message.reference is not None and isinstance(message.reference.resolved, discord.Message): # other options are None or DeletedReferencedMessage
             await message.add_reaction("⬆️")
             await message.reference.resolved.add_reaction("⬆️")
+            if message.author == message.reference.resolved.author:
+                await Achievements.give_ach(message.guild, message.author, "Random", "friendlyfire", message.channel)
     if re.search("\d+\.\d+\.\d+\.\d+", message.content):
         await message.reply(f"{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}")
 
@@ -180,6 +182,11 @@ async def quote(ctx):
 async def meow(ctx):
     await ctx.send(f"http://placekitten.com/{random.randint(480,520)}/{random.randint(480,520)}")
 
+async def guild_only(self, ctx):
+    if ctx.guild is None:
+        raise commands.NoPrivateMessage("No DMs!")
+    return True
+
 class Database(commands.Cog):
     @classmethod
     def load(cls):
@@ -209,6 +216,7 @@ class Database(commands.Cog):
         else:
             user_db[symbol] = count
         Database.save()
+    @classmethod
     def reset_cooldown(cls, server, member, cooldown=600):
         user_db = Database.get_member(server, member)
         user_db["cooldown"] = time.time() + cooldown
@@ -263,6 +271,7 @@ class Symbols(commands.Cog):
                 output += symbol + "\n"
                 Database.add_symbol(ctx.guild, ctx.author, symbol)
             await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Here's what you got", description=output))
+            await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "first", ctx.channel)
 
     @commands.hybrid_command(brief="Crafts two symbols together.", help="Crafts two symbols together to get a new symbol. An optional amount parameter allows you to craft in bulk.")
     async def craft(self, ctx, sym1: Symbol, sym2: Symbol, amt:int=1):
@@ -298,8 +307,10 @@ class Symbols(commands.Cog):
         user[sym2] -= amt
         Database.add_symbol(ctx.guild, ctx.author, result, amt)
         await ctx.send(f"You got {result} x{amt}!")
+        await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "craft", ctx.channel)
         if result in bonus_unlocks.keys():
             await ctx.send(f"Congratulations! Because you have {result}, you can now get {bonus_unlocks[result]} from m!getsymbol!")
+            await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "bonus_unlock", ctx.channel)
 
     @commands.hybrid_command(brief="Allows you to give symbols to others.", help="Donates symbols. An optional argument allows you to donate in bulk.")
     async def donate(self, ctx, reciever: discord.Member, symbol: Symbol, amount:int=1):
@@ -315,6 +326,7 @@ class Symbols(commands.Cog):
         user[symbol] -= amount
         Database.add_symbol(ctx.guild, reciever, symbol, amount)
         await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Donation successful", description=f"Successfully transferred {symbol} x{amount} to {reciever.name}."))
+        await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "Generous", ctx.channel)
 
     @commands.hybrid_command(brief="Recycle multiple of the same symbol to get other symbols!", help="Recycles multiples of symbols to get others. You will always get one less symbol than you put in.")
     async def recycle(self, ctx, symbol: Symbol, amount:int=2):
@@ -337,7 +349,7 @@ class Symbols(commands.Cog):
         # thanks to milenakos for the code
         person1 = ctx.author
         if person1 == person2:
-            await ctx.send("no friends")
+            await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "nofriends", ctx.channel)
 
         person1accept = False
         person2accept = False
@@ -349,6 +361,7 @@ class Symbols(commands.Cog):
             nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
             if interaction.user != person1 and interaction.user != person2:
                 await interaction.response.send_message("no", ephemeral = True)
+                await Achievements.give_ach(ctx.guild, ctx.author, "Random", "nope", ctx.channel)
                 return
             person1offer = {}
             person2offer = {}
@@ -357,6 +370,7 @@ class Symbols(commands.Cog):
             nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
             if interaction.user != person1 and interaction.user != person2:
                 await interaction.response.send_message("no", ephemeral = True)
+                await Achievements.give_ach(ctx.guild, ctx.author, "Random", "nope", ctx.channel)
                 return
             if interaction.user == person1:
                 person1accept = not person1accept
@@ -395,6 +409,7 @@ class Symbols(commands.Cog):
             nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
             if interaction.user != person1 and interaction.user != person2:
                 await interaction.response.send_message("no", ephemeral = True)
+                await Achievements.give_ach(ctx.guild, ctx.author, "Random", "nope", ctx.channel)
                 return
             if interaction.user == person1:
                 currentuser = 1
@@ -477,7 +492,7 @@ class Symbols(commands.Cog):
                     if int(self.amount.value) <= 0:
                         raise Exception
                 except Exception:
-                         return
+                    return
                 if not self.symbol.value.title() in symbols:
                     return
                 if self.currentuser == 1:
@@ -490,7 +505,7 @@ class Symbols(commands.Cog):
                         current_set = person2offer[self.symbol.value.title()]
                     else:
                         current_set = 0
-                if not Database.has_symbol(interaction.guild, interaction.user, self.symbol.value.title(), int(self.amount.value)):
+                if not Database.has_symbol(interaction.guild, interaction.user, self.symbol.value.title(), current_set + int(self.amount.value)):
                     return
                 if self.currentuser == 1:
                     if self.symbol.value.title() in person1offer.keys():
@@ -504,14 +519,13 @@ class Symbols(commands.Cog):
                         person2offer[self.symbol.value.title()] = int(self.amount.value)
                 await interaction.response.defer()
                 await update_trade_embed(interaction)
-
-    async def guild_only(self, ctx):
-        if ctx.guild is None:
-            raise commands.NoPrivateMessage("No DMs!")
-        return True
-Symbols.cog_check = Symbols.guild_only
+Symbols.cog_check = guild_only
 
 class Achievements(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        self.load()
+
     @classmethod
     def load(cls):
         with open("achs.json", "r") as f:
@@ -521,6 +535,7 @@ class Achievements(commands.Cog):
         user_db = Database.get_member(guild, member)
         if "achs" not in user_db.keys():
             user_db["achs"] = {}
+        Database.save()
     @classmethod
     def has_ach(cls, guild, member, ach):
         Achievements.register(guild, member)
@@ -528,40 +543,52 @@ class Achievements(commands.Cog):
         if ach not in user_db.keys():
             return False
         return user_db[ach]
-    @bot.hybrid_command(brief="See your achievements", help="Lists your achievements by category")
-    async def achs(ctx):
+    @classmethod
+    async def give_ach(cls, guild, member, category, ach, messageable):
+        Achievements.register(guild, member)
+        Database.get_member(guild, member)["achs"][ach] = True
+        Database.save()
+        ach_data = Achievements.achievements[category][ach]
+        await messageable.send(embed=discord.Embed(color=discord.Color.brand_green(), title=ach_data["name"], description=ach_data["desc"]))
+    @commands.hybrid_command(brief="See your achievements", help="Lists your achievements by category")
+    async def achs(self, ctx):
         Achievements.register(ctx.guild, ctx.author)
         user_db = Database.get_member(ctx.guild, ctx.author)["achs"]
         category = "Symbols"
         async def gen_embed():
             nonlocal category
-            embed = discord.Embed(title="Achievements", description="Category: " + category)
+            embed = discord.Embed(color=discord.Color.brand_green(), title="Achievements", description="Category: " + category)
             for k, v in Achievements.achievements[category].items():
-                emoji = "✅" if Achievements.has_ach(ctx.guild, ctx.member, k) else "⬜"
+                emoji = "✅" if Achievements.has_ach(ctx.guild, ctx.author, k) else "⬜"
                 embed.add_field(name=emoji + " " + v["name"], value=v["desc"])
             view = ui.View()
-            for i in user_db.keys():
-                if i == category:
-                    button = ui.Button(label=i, style=discord.ButtonStyle.blurple)
-                else:
-                    button = ui.Button(label=i, style=discord.ButtonStyle.green)
+            async def gen_callback(new_category):
+                nonlocal category
                 async def callback(interaction):
-                    nonlocal category, i
-                    category = i
-                    embed, view = gen_embed()
-                    interaction.response.edit_message(embed=embed, view=view)
-                button.callback = callback
+                    nonlocal category
+                    nonlocal new_category
+                    category = new_category
+                    embed, view = await gen_embed()
+                    await interaction.response.edit_message(embed=embed, view=view)
+                return callback
+            for i in Achievements.achievements.keys():
+                if i == category:
+                    button = ui.Button(label=i, style=discord.ButtonStyle.green)
+                else:
+                    button = ui.Button(label=i, style=discord.ButtonStyle.blurple)
+                button.callback = await gen_callback(i)
                 view.add_item(button)
             return embed, view
-        embed, view = gen_embed()
+        embed, view = await gen_embed()
         await ctx.send(embed=embed, view=view)
-
+Achievements.cog_check = guild_only
         
 
 
 Database.load()
 
 asyncio.run(bot.add_cog(Symbols(bot)))
+asyncio.run(bot.add_cog(Achievements(bot)))
 
 async def on_command_error(ctx, error):
     if isinstance(error, commands.BadArgument):

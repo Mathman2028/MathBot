@@ -25,6 +25,10 @@
     "nope": {
       "name": "Nope",
       "desc": "Try to interact with something you can't interact with"
+    },
+    "friendlyfire": {
+      "name": "Friendly Fire",
+      "desc": "Ratio yourself"
     }
   }
 }
