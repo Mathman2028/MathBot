@@ -515,14 +515,47 @@ class Achievements(commands.Cog):
     @classmethod
     def load(cls):
         with open("achs.json", "r") as f:
-            Achievements.achs = json.load(f)
+            Achievements.achievements = json.load(f)
     @classmethod
     def register(cls, guild, member):
         user_db = Database.get_member(guild, member)
         if "achs" not in user_db.keys():
             user_db["achs"] = {}
+    @classmethod
+    def has_ach(cls, guild, member, ach):
+        Achievements.register(guild, member)
+        user_db = Database.get_member(guild, member)["achs"]
+        if ach not in user_db.keys():
+            return False
+        return user_db[ach]
     @bot.hybrid_command(brief="See your achievements", help="Lists your achievements by category")
     async def achs(ctx):
+        Achievements.register(ctx.guild, ctx.author)
+        user_db = Database.get_member(ctx.guild, ctx.author)["achs"]
+        category = "Symbols"
+        async def gen_embed():
+            nonlocal category
+            embed = discord.Embed(title="Achievements", description="Category: " + category)
+            for k, v in Achievements.achievements[category].items():
+                emoji = "✅" if Achievements.has_ach(ctx.guild, ctx.member, k) else "⬜"
+                embed.add_field(name=emoji + " " + v["name"], value=v["desc"])
+            view = ui.View()
+            for i in user_db.keys():
+                if i == category:
+                    button = ui.Button(label=i, style=discord.ButtonStyle.blurple)
+                else:
+                    button = ui.Button(label=i, style=discord.ButtonStyle.green)
+                async def callback(interaction):
+                    nonlocal category, i
+                    category = i
+                    embed, view = gen_embed()
+                    interaction.response.edit_message(embed=embed, view=view)
+                button.callback = callback
+                view.add_item(button)
+            return embed, view
+        embed, view = gen_embed()
+        await ctx.send(embed=embed, view=view)
+
         
 
 
