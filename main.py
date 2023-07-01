@@ -326,7 +326,7 @@ class Symbols(commands.Cog):
         user[symbol] -= amount
         Database.add_symbol(ctx.guild, reciever, symbol, amount)
         await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Donation successful", description=f"Successfully transferred {symbol} x{amount} to {reciever.name}."))
-        await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "Generous", ctx.channel)
+        await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "donate", ctx.channel)
 
     @commands.hybrid_command(brief="Recycle multiple of the same symbol to get other symbols!", help="Recycles multiples of symbols to get others. You will always get one less symbol than you put in.")
     async def recycle(self, ctx, symbol: Symbol, amount:int=2):
@@ -551,7 +551,9 @@ class Achievements(commands.Cog):
         Database.save()
         ach_data = Achievements.achievements[category][ach]
         if new_ach:
-            await messageable.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Achievement get: " + ach_data["name"], description=ach_data["desc"]))
+            embed = discord.Embed(color=discord.Color.brand_green(), title="Achievement get: " + ach_data["name"], description=ach_data["desc"])
+            embed.footer = f"Achieved by {member.name}"
+            await messageable.send(embed=embed)
     @commands.hybrid_command(brief="See your achievements", help="Lists your achievements by category")
     async def achs(self, ctx):
         Achievements.register(ctx.guild, ctx.author)
