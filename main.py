@@ -552,7 +552,7 @@ class Achievements(commands.Cog):
         ach_data = Achievements.achievements[category][ach]
         if new_ach:
             embed = discord.Embed(color=discord.Color.brand_green(), title="Achievement get: " + ach_data["name"], description=ach_data["desc"])
-            embed.footer = f"Achieved by {member.name}"
+            embed.set_footer(f"Achieved by {member.name}")
             await messageable.send(embed=embed)
     @commands.hybrid_command(brief="See your achievements", help="Lists your achievements by category")
     async def achs(self, ctx):
