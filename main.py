@@ -69,7 +69,9 @@ bonus_unlocks = {
 "Logarithm": "Multiplication"
 }
 
-symbols = list(set(base_symbols) | set(recipes.values()) | {"Point"})
+special_symbols = {"Point"}
+
+symbols = list(set(base_symbols) | set(recipes.values()) | special_symbols)
 symbols.sort()
 
 @bot.event
@@ -322,6 +324,7 @@ class Symbols(commands.Cog):
             return
         if reciever == ctx.author:
             await ctx.send("no way")
+            return
         user = Database.get_member(ctx.guild, ctx.author)
         user[symbol] -= amount
         Database.add_symbol(ctx.guild, reciever, symbol, amount)
