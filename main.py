@@ -361,7 +361,7 @@ class Symbols(commands.Cog):
             nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
             if interaction.user != person1 and interaction.user != person2:
                 await interaction.response.send_message("no", ephemeral = True)
-                await Achievements.give_ach(ctx.guild, ctx.author, "Random", "nope", ctx.channel)
+                await Achievements.give_ach(interaction.guild, interaction.user, "Random", "nope", ctx.channel)
                 return
             person1offer = {}
             person2offer = {}
@@ -370,7 +370,7 @@ class Symbols(commands.Cog):
             nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
             if interaction.user != person1 and interaction.user != person2:
                 await interaction.response.send_message("no", ephemeral = True)
-                await Achievements.give_ach(ctx.guild, ctx.author, "Random", "nope", ctx.channel)
+                await Achievements.give_ach(interaction.guild, interaction.user, "Random", "nope", ctx.channel)
                 return
             if interaction.user == person1:
                 person1accept = not person1accept
@@ -409,7 +409,7 @@ class Symbols(commands.Cog):
             nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
             if interaction.user != person1 and interaction.user != person2:
                 await interaction.response.send_message("no", ephemeral = True)
-                await Achievements.give_ach(ctx.guild, ctx.author, "Random", "nope", ctx.channel)
+                await Achievements.give_ach(interaction.guild, interaction.user, "Random", "nope", ctx.channel)
                 return
             if interaction.user == person1:
                 currentuser = 1
