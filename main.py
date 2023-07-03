@@ -9,6 +9,8 @@ import math
 import asyncio
 import typing
 import re
+import chess
+from discord.interactions import Interaction
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -183,6 +185,71 @@ async def quote(ctx):
 @bot.hybrid_command(brief="Get Cat", help="cat")
 async def meow(ctx):
     await ctx.send(f"http://placekitten.com/{random.randint(480,520)}/{random.randint(480,520)}")
+
+@bot.hybrid_command(brief="Play a game of chess", help="google en passant")
+async def playchess(ctx, opponent: discord.Member):
+    board = chess.Board()
+    white = ctx.author
+    black = opponent # Might change this to either be random or make the challenger black
+    game_over = False
+
+    class ChessModal(ui.Modal):
+        def __init__(self):
+            super().__init__(title="Make a move")
+
+            self.move = ui.TextInput(
+                label="Your move",
+                placeholder="Nf6",
+                min_length=2,
+                max_length=10
+            )
+            self.add_item(self.move)
+
+        async def on_submit(self, interaction):
+            board.push_san(self.move.value)
+            await interaction.response.defer()
+            await update_chess_embed(interaction)
+    
+    async def claim_draw(interaction):
+        if not(interaction.user in (white, black)):
+            await interaction.response.send_message("Can't do that", ephemeral=True)
+        nonlocal game_over
+        game_over = True
+        interaction.response.defer()
+        update_chess_embed()
+
+    async def play_move(interaction):
+        if not ((interaction.user == white and board.turn == chess.WHITE) or (interaction.user == black and board.turn == chess.BLACK)):
+            await interaction.response.send_message("Either it's not your turn or you aren't playing in this game.", ephemeral=True)
+            return
+        await interaction.response.send_modal(ChessModal())
+        
+    async def gen_embed():
+        if board.turn == chess.WHITE:
+            color = discord.Color.light_embed()
+        else:
+            color = discord.Color.dark_embed()
+        embed = discord.Embed(color=color, title=f"Chess game", description=f"{white.name} plays white (uppercase), {black.name} plays black (lowercase)")
+        embed.add_field(name="Board", value=f"```\n{board}\n```", inline=False)
+        view = ui.View()
+        move_button = ui.Button(style=discord.ButtonStyle.primary, label="Move", disabled=board.is_game_over() or game_over)
+        move_button.callback = play_move
+        view.add_item(move_button)
+        claim_draw_button = ui.Button(style=discord.ButtonStyle.secondary, label="Claim Draw", disabled=(not board.can_claim_draw()))
+        claim_draw_button.callback = claim_draw
+        view.add_item(claim_draw_button)
+        if game_over:
+            embed.add_field(name="Result", value="1/2-1/2")
+        elif board.is_game_over():
+            embed.add_field(name="Result", value=board.outcome().result())
+        return embed, view
+    async def update_chess_embed(interaction):
+        embed, view = await gen_embed()
+        await interaction.message.edit(embed=embed, view=view)
+    embed, view = await gen_embed()
+    await ctx.send(embed=embed, view=view)
+
+
 
 async def guild_only(self, ctx):
     if ctx.guild is None:
