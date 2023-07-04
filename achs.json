@@ -12,10 +12,6 @@
       "name": "Crafter",
       "desc": "Craft a symbol using what you have now"
     },
-    "nofriends": {
-      "name": "Introvert",
-      "desc": "Attempt to trade yourself"
-    },
     "donate": {
       "name": "Generous",
       "desc": "Donate a symbol to someone"
@@ -26,9 +22,17 @@
       "name": "Nope",
       "desc": "Try to interact with something you can't interact with"
     },
+    "nofriends": {
+      "name": "Introvert",
+      "desc": "Put yourself as the second person in a two-person command"
+    },
     "friendlyfire": {
       "name": "Friendly Fire",
       "desc": "Ratio yourself"
+    },
+    "enpassant": {
+      "name": "Holy Hell",
+      "desc": "Google En Passant"
     }
   }
 }

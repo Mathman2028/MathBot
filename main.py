@@ -188,6 +188,11 @@ async def meow(ctx):
 
 @bot.hybrid_command(brief="Play a game of chess", help="google en passant")
 async def playchess(ctx, opponent: discord.Member):
+    if opponent == ctx.author:
+        await ctx.send("Nope")
+        await Achievements.give_ach(ctx.guild, ctx.author, "Random", "nofriends", ctx.channel)
+        return
+
     board = chess.Board()
     white = ctx.author
     black = opponent # Might change this to either be random or make the challenger black
@@ -206,7 +211,9 @@ async def playchess(ctx, opponent: discord.Member):
             self.add_item(self.move)
 
         async def on_submit(self, interaction):
-            board.push_san(self.move.value)
+            move = board.push_san(self.move.value)
+            if board.is_en_passant(move):
+                await Achievements.give_ach(interaction.guild, interaction.user, "Random", "enpassant", interaction.channel)
             await interaction.response.defer()
             await update_chess_embed(interaction)
     
@@ -248,8 +255,6 @@ async def playchess(ctx, opponent: discord.Member):
         await interaction.message.edit(embed=embed, view=view)
     embed, view = await gen_embed()
     await ctx.send(embed=embed, view=view)
-
-
 
 async def guild_only(self, ctx):
     if ctx.guild is None:
@@ -390,7 +395,8 @@ class Symbols(commands.Cog):
             await ctx.send("You don't have enough!")
             return
         if reciever == ctx.author:
-            await ctx.send("no way")
+            await ctx.send("That doesn't count")
+            await Achievements.give_ach(ctx.guild, ctx.author, "Random", "nofriends", ctx.channel)
             return
         user = Database.get_member(ctx.guild, ctx.author)
         user[symbol] -= amount
@@ -419,7 +425,7 @@ class Symbols(commands.Cog):
         # thanks to milenakos for the code
         person1 = ctx.author
         if person1 == person2:
-            await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "nofriends", ctx.channel)
+            await Achievements.give_ach(ctx.guild, ctx.author, "Random", "nofriends", ctx.channel)
 
         person1accept = False
         person2accept = False
