@@ -238,7 +238,7 @@ async def playchess(ctx, opponent: discord.Member):
             color = discord.Color.dark_embed()
         embed = discord.Embed(color=color, title=f"Chess game", description=f"{white.name} plays white (uppercase), {black.name} plays black (lowercase)")
         embed.add_field(name="Board", value=f"```\n{board}\n```", inline=False)
-        view = ui.View()
+        view = ui.View(timeout=3 * 3600)
         move_button = ui.Button(style=discord.ButtonStyle.primary, label="Move", disabled=board.is_game_over() or game_over)
         move_button.callback = play_move
         view.add_item(move_button)
