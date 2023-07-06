@@ -199,11 +199,17 @@ async def playchess(ctx, opponent: discord.Member):
     game_over = False
 
     async def process_board(board: chess.Board) -> str:
-        board_ranks_str = str(board).splitlines()
-        new_str = ""
-        for i, v in enumerate(board_ranks_str):
-            new_str += str(8 - i) + " " + v + "\n"
-        return new_str + "  a b c d e f g h"
+        EMPTY = "⊙"
+        final = ""
+        for rank in range(7, -1, -1):
+            rank_str = ""
+            for file in range(8):
+                piece = board.piece_at(chess.square(file, rank))
+                rank_str += piece.unicode_symbol() if piece is not None else EMPTY
+            final += rank_str + "\n"
+        return final
+
+        
 
 
 
@@ -241,11 +247,7 @@ async def playchess(ctx, opponent: discord.Member):
         await interaction.response.send_modal(ChessModal())
         
     async def gen_embed():
-        if board.turn == chess.WHITE:
-            color = discord.Color.light_embed()
-        else:
-            color = discord.Color.dark_embed()
-        embed = discord.Embed(color=color, title=f"Chess game", description=f"{white.name} plays white (uppercase), {black.name} plays black (lowercase)")
+        embed = discord.Embed(color=0x000000 if board.turn == chess.BLACK else 0xffffff, title=f"Chess game", description=f"{white.name} plays white (uppercase), {black.name} plays black (lowercase)")
         embed.add_field(name="Board", value=f"```\n{await process_board(board)}\n```", inline=False)
         view = ui.View(timeout=3 * 3600)
         move_button = ui.Button(style=discord.ButtonStyle.primary, label="Move", disabled=board.is_game_over() or game_over)
