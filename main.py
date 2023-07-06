@@ -649,7 +649,7 @@ class Achievements(commands.Cog):
             embed = discord.Embed(color=discord.Color.brand_green(), title="Achievements", description="Category: " + category)
             for k, v in Achievements.achievements[category].items():
                 emoji = "✅" if Achievements.has_ach(ctx.guild, ctx.author, k) else "⬜"
-                embed.add_field(name=emoji + " " + v["name"], value=v["desc"])
+                embed.add_field(name=emoji + " " + v["name"], value=v["desc"] if category != "Random" or Achievements.has_ach(ctx.guild, ctx.author, k) else "???")
             view = ui.View()
             async def gen_callback(new_category):
                 nonlocal category
