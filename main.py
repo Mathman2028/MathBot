@@ -198,6 +198,15 @@ async def playchess(ctx, opponent: discord.Member):
     black = opponent # Might change this to either be random or make the challenger black
     game_over = False
 
+    async def process_board(board: chess.Board) -> str:
+        board_ranks_str = str(board).splitlines()
+        new_str = ""
+        for i, v in enumerate(board_ranks_str):
+            new_str += str(8 - i) + " " + v + "\n"
+        return new_str + "  a b c d e f g h"
+
+
+
     class ChessModal(ui.Modal):
         def __init__(self):
             super().__init__(title="Make a move")
@@ -237,7 +246,7 @@ async def playchess(ctx, opponent: discord.Member):
         else:
             color = discord.Color.dark_embed()
         embed = discord.Embed(color=color, title=f"Chess game", description=f"{white.name} plays white (uppercase), {black.name} plays black (lowercase)")
-        embed.add_field(name="Board", value=f"```\n{board}\n```", inline=False)
+        embed.add_field(name="Board", value=f"```\n{await process_board(board)}\n```", inline=False)
         view = ui.View(timeout=3 * 3600)
         move_button = ui.Button(style=discord.ButtonStyle.primary, label="Move", disabled=board.is_game_over() or game_over)
         move_button.callback = play_move
