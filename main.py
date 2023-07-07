@@ -10,7 +10,6 @@ import asyncio
 import typing
 import re
 import chess
-from discord.interactions import Interaction
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -267,7 +266,100 @@ async def playchess(ctx, opponent: discord.Member):
     embed, view = await gen_embed()
     await ctx.send(embed=embed, view=view)
 
-async def guild_only(self, ctx):
+@bot.hybrid_command(brief="Enter the dungeon", help="Enter a randomly generated dungeon with 10 HP. Good luck!")
+async def dungeon(ctx):
+    roomtypes = ["Enemy"] * 9 + ["Empty"] * 4 + ["Heal"] * 2
+    emojis = {
+        "Enemy": "💀",
+        "Empty": "⬛",
+        "Boss": "☠️",
+        "Heal": "❤️"
+    }
+    desc = {
+        "Empty": "You find yourself in an empty room. There's no danger here...but you feel like you should keep moving.",
+        "Enemy": "You find some monsters in this room. You have taken 1 HP of damage from fighting them.",
+        "Heal": "This room seems safe. You take some time to rest, healing 1 HP.",
+        "Boss": "You see treasure, but a boss guards it. Good luck!"
+    }
+    health = 10
+    bossfound = False
+    class Room():
+        def __init__(self, parent: "Room", type: typing.Optional[str] = None, exitcount: typing.Optional[int] = None):
+            nonlocal bossfound
+            self.parent = parent
+            if type == None:
+                self.type = random.choice(roomtypes + ["Boss"] if not bossfound else roomtypes)
+            else:
+                self.type = type
+            if self.type == "Boss":
+                bossfound = True
+            if exitcount == None:
+                if self.type == "Boss":
+                    self.exitcount = 0
+                elif bossfound:
+                    self.exitcount = random.randint(0, 1)
+                else:
+                    self.exitcount = random.randint(1, 2)
+            else:
+                self.exitcount = exitcount
+            self.exits = None
+        async def gen_exits(self):
+            if self.exits is not None:
+                return
+            self.exits = []
+            for _ in range(self.exitcount):
+                self.exits.append(Room(self))
+    currentroom = Room(None, "Empty", 2)
+    async def gen_callback(room):
+        nonlocal currentroom
+        async def callback(interaction):
+            nonlocal currentroom, room
+            currentroom = room
+            embed, view = await gen_embed()
+            await interaction.response.defer()
+            await interaction.message.edit(embed=embed, view=view)
+        return callback
+
+    async def gen_embed():
+        nonlocal health, currentroom
+        embed = discord.Embed(color=discord.Color.darker_gray(), title="The Dungeon", description=desc[currentroom.type])
+        if currentroom.type == "Enemy":
+            health -= 1
+            currentroom.type = "Empty"
+        elif currentroom.type == "Heal":
+            health += 1
+            currentroom.type = "Empty"
+        elif currentroom.type == "Boss":
+            health -= random.randint(3, 6)
+        if health <= 0:
+            health = 0
+            embed.add_field(name="HP", value="Your health has reached 0. You have failed!")
+        else:
+            health = health if health < 10 else 10
+            embed.add_field(name="HP", value=f"{health}/10")
+        if currentroom.type == "Boss":
+            view = ui.View()
+            async def victory(interaction):
+                await interaction.message.edit(embed=discord.Embed(title="The Dungeon", description="You have won! Good job."), view=None)
+            win_button = ui.Button(emoji="💎", disabled=health == 0)
+            win_button.callback = victory
+            view.add_item(win_button)
+            return embed, view
+        view = ui.View()
+        backtrack = ui.Button(emoji="↩️", disabled=(currentroom.parent is None) or health == 0)
+        if currentroom.parent is not None:
+            backtrack.callback = await gen_callback(currentroom.parent)
+        view.add_item(backtrack)
+        await currentroom.gen_exits()
+        for i in currentroom.exits:
+            button = ui.Button(emoji=emojis[i.type], disabled=health == 0)
+            button.callback = await gen_callback(i)
+            view.add_item(button)
+        return embed, view
+    embed, view = await gen_embed()
+    await ctx.send(embed=embed, view=view)
+        
+async def guild_only(_, ctx):
     if ctx.guild is None:
         raise commands.NoPrivateMessage("No DMs!")
     return True
