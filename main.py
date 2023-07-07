@@ -314,6 +314,9 @@ async def dungeon(ctx):
         nonlocal currentroom
         async def callback(interaction):
             nonlocal currentroom, room
+            if interaction.user != ctx.author:
+                await interaction.response.send_message("Start your own dungeon", ephemeral=True)
+                return
             currentroom = room
             embed, view = await gen_embed()
             await interaction.response.defer()
@@ -750,6 +753,8 @@ class Achievements(commands.Cog):
                 async def callback(interaction):
                     nonlocal category
                     nonlocal new_category
+                    if interaction.user != ctx.author:
+                        await interaction.response.send_message("Not your achievement embed", ephemeral=True)
                     category = new_category
                     embed, view = await gen_embed()
                     await interaction.response.edit_message(embed=embed, view=view)
