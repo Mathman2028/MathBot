@@ -419,7 +419,14 @@ class Symbols(commands.Cog):
     class Symbol(commands.Converter):
         async def convert(self, ctx, argument):
             if not argument.title() in symbols:
-                raise commands.BadArgument(message=f"{argument} isn't a valid symbol!")
+                possible = []
+                for i in symbols:
+                    if i.startswith(argument.title()):
+                        possible.append(i)
+                if len(possible) == 1:
+                    return possible[0]
+                else:
+                    raise commands.BadArgument(message=f"{argument} isn't a valid symbol!")
             return argument.title()
 
     def __init__(self, bot):
@@ -797,7 +804,7 @@ asyncio.run(bot.add_cog(Achievements(bot)))
 
 async def on_command_error(ctx, error):
     if isinstance(error, commands.BadArgument):
-        await ctx.send("goofy ahh arguments")
+        await ctx.send(error.args[0])
     elif isinstance(error, commands.TooManyArguments):
         await ctx.send("thats too many arguments")
     elif isinstance(error, commands.CheckFailure):
