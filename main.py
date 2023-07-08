@@ -114,6 +114,8 @@ async def stupidcalculator(ctx, num1: int, op, num2: int):
             await ctx.send("Fish")
         elif num1 == num2 == 3:
             await ctx.send("8")
+        elif num1 == 9 and num2 == 10:
+            await ctx.send("21")
         else:
             await ctx.send(str(num1) + str(num2))
     elif op in ("-", "minus", "subtract"):
