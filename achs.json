@@ -33,6 +33,10 @@
     "enpassant": {
       "name": "Holy Hell",
       "desc": "Google En Passant"
+    },
+    "dungeon": {
+      "name": "Dungeon Explorer",
+      "desc": "Complete a Dungeon"
     }
   }
 }

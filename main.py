@@ -270,7 +270,7 @@ async def playchess(ctx, opponent: discord.Member):
 
 @bot.hybrid_command(brief="Enter the dungeon", help="Enter a randomly generated dungeon with 10 HP. Good luck!")
 async def dungeon(ctx):
-    roomtypes = ["Enemy"] * 9 + ["Empty"] * 4 + ["Heal"] * 2
+    roomtypes = ["Enemy"] * 10 + ["Empty"] * 5 + ["Heal"] * 4
     emojis = {
         "Enemy": "💀",
         "Empty": "⬛",
@@ -345,7 +345,10 @@ async def dungeon(ctx):
         if currentroom.type == "Boss":
             view = ui.View()
             async def victory(interaction):
+                if interaction.user != ctx.author:
+                    await interaction.response.send_message("Start your own dungeon", ephemeral=True)
                 await interaction.message.edit(embed=discord.Embed(title="The Dungeon", description="You have won! Good job."), view=None)
+                await Achievements.give_ach(ctx.guild, ctx.author, "Random", "dungeon", ctx.channel)
             win_button = ui.Button(emoji="💎", disabled=health == 0)
             win_button.callback = victory
             view.add_item(win_button)
