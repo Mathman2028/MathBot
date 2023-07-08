@@ -492,6 +492,21 @@ class Symbols(commands.Cog):
             await ctx.send(f"Congratulations! Because you have {result}, you can now get {bonus_unlocks[result]} from m!getsymbol!")
             await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "bonus_unlock", ctx.channel)
 
+    @commands.hybrid_command(brief="Shows recipes involving a symbol.")
+    async def recipes(self, ctx, symbol: Symbol):
+        output = ""
+        user_db = Database.get_member(ctx.guild, ctx.author)
+        async def process_symbol(symbol):
+            if symbol in user_db.keys():
+                return symbol
+            else:
+                return "???"
+        for k, v in recipes.items():
+            if symbol not in k and symbol != v:
+                continue
+            output += f"{await process_symbol(k[0])} + {await process_symbol(k[1])} = {await process_symbol(v)}\n"
+        await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title=f"Recipes with {symbol}", description=output))
+
     @commands.hybrid_command(brief="Allows you to give symbols to others.", help="Donates symbols. An optional argument allows you to donate in bulk.")
     async def donate(self, ctx, reciever: discord.Member, symbol: Symbol, amount:int=1):
         if amount < 1:
