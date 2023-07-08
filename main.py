@@ -808,6 +808,7 @@ async def on_command_error(ctx, error):
         await ctx.send("not a real command 💀💀💀")
     else:
         await ctx.send(embed=discord.Embed(title="An error occured!", description=error, color=discord.Color.red()))
+@bot.tree.error
 async def on_app_command_error(interaction, error):
     if isinstance(error, app_commands.TransformerError):
         await interaction.response.send_message("goofy ahh arguments")
@@ -818,7 +819,6 @@ async def on_app_command_error(interaction, error):
     else:
         await interaction.response.send_message(embed=discord.Embed(title="An error occured!", description=error, color=discord.Color.red()))
 bot.on_command_error = on_command_error
-bot.tree.on_error = on_app_command_error
 
 try:
     bot.run(TOKEN)
