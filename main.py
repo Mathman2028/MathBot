@@ -60,6 +60,8 @@ recipes = {("Increment", "Increment"): "Addition",
 ("Circle", "Division"): "Pi",
 ("Polygon", "Polygon"): "Solid",
 ("Solid", "Circle"): "Sphere",
+("Circle", "Line"): "Cone",
+("Cone", "Plane"): "Conic Section"
 }
 
 base_symbols = ["One", "Increment", "Inverse"]
