@@ -347,8 +347,9 @@ async def dungeon(ctx):
             async def victory(interaction):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("Start your own dungeon", ephemeral=True)
-                await interaction.message.edit(embed=discord.Embed(title="The Dungeon", description="You have won! Good job."), view=None)
+                await interaction.response.defer()
                 await Achievements.give_ach(ctx.guild, ctx.author, "Random", "dungeon", ctx.channel)
+                await interaction.message.edit(embed=discord.Embed(title="The Dungeon", description="You have won! Good job."), view=None)
             win_button = ui.Button(emoji="💎", disabled=health == 0)
             win_button.callback = victory
             view.add_item(win_button)
@@ -797,8 +798,6 @@ class Achievements(commands.Cog):
         embed, view = await gen_embed()
         await ctx.send(embed=embed, view=view)
 Achievements.cog_check = guild_only
-        
-
 
 Database.load()
 
