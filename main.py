@@ -555,6 +555,8 @@ class Symbols(commands.Cog):
         output = "Here's what you got:\n"
         for _ in range(amount - 1):
             new_symbol = random.choice(recycle_results)
+            while new_symbol == symbol:
+                new_symbol = random.choice(recycle_results)
             output += new_symbol + "\n"
             Database.add_symbol(ctx.guild, ctx.author, new_symbol)
         await ctx.send(output)
