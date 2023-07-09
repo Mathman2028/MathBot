@@ -156,6 +156,8 @@ async def easter_eggs(message):
         await message.reply("holy hell")
     if "xnopyt" in message.content.lower():
         await message.reply("If you accept the definition of a word as some letters surrounded by a gap, then \"xnopyt\", \"aaaaaaajjjjjjjjj\", and \"hrrkrkrkrwpfrbbrbrbrlablblblblblblwhitoo'ap\" are all words, despite being pretty much meaningless.")
+    if "chess battle advanced" in message.content.lower():
+        await message.reply("https://streamable.com/1z7eh")
     if message.content.lower() == "ratio":
         if message.reference is not None and isinstance(message.reference.resolved, discord.Message): # other options are None or DeletedReferencedMessage
             await message.add_reaction("⬆️")
