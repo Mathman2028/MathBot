@@ -71,7 +71,7 @@ recycle_results = base_symbols + ["Point"]
 bonus_unlocks = {
 "Complex Numbers": "Real Numbers",
 "Logarithm": "Multiplication",
-"Sphere": "Point",
+"Sphere": "Line Segment",
 "Space": "Infinity",
 }
 
