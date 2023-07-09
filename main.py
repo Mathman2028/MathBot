@@ -61,7 +61,8 @@ recipes = {("Increment", "Increment"): "Addition",
 ("Polygon", "Polygon"): "Solid",
 ("Solid", "Circle"): "Sphere",
 ("Circle", "Line"): "Cone",
-("Cone", "Plane"): "Conic Section"
+("Cone", "Plane"): "Conic Section",
+("Plane", "Infinity"): "Space",
 }
 
 base_symbols = ["One", "Increment", "Inverse"]
@@ -71,6 +72,7 @@ bonus_unlocks = {
 "Complex Numbers": "Real Numbers",
 "Logarithm": "Multiplication",
 "Sphere": "Point",
+"Space": "Infinity",
 }
 
 special_symbols = {"Point"}
