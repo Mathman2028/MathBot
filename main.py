@@ -323,6 +323,7 @@ async def dungeon(ctx):
             nonlocal currentroom, room
             if interaction.user != ctx.author:
                 await interaction.response.send_message("Start your own dungeon", ephemeral=True)
+                await Achievements.give_ach(ctx.guild, interaction.user, "Random", "nope", ctx.channel)
                 return
             currentroom = room
             embed, view = await gen_embed()
@@ -352,6 +353,8 @@ async def dungeon(ctx):
             async def victory(interaction):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("Start your own dungeon", ephemeral=True)
+                    await Achievements.give_ach(ctx.guild, interaction.user, "Random", "nope", ctx.channel)
+                    return
                 await interaction.response.defer()
                 await Achievements.give_ach(ctx.guild, ctx.author, "Random", "dungeon", ctx.channel)
                 await interaction.message.edit(embed=discord.Embed(title="The Dungeon", description="You have won! Good job."), view=None)
