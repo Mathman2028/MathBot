@@ -569,14 +569,14 @@ class Symbols(commands.Cog):
             await ctx.send("You don't have enough!")
         user = Database.get_member(ctx.guild, ctx.author)
         user[symbol] -= amount
-        output = "Here's what you got:\n"
+        output = ""
         for _ in range(amount - 1):
             new_symbol = random.choice(recycle_results)
             while new_symbol == symbol:
                 new_symbol = random.choice(recycle_results)
             output += new_symbol + "\n"
             Database.add_symbol(ctx.guild, ctx.author, new_symbol)
-        await ctx.send(output)
+        await ctx.send(discord.Embed(title="Recycle results", description=output))
 
     @commands.hybrid_command(brief="Trade symbols with another member.", help="Does this really need an explanation?")
     async def trade(self, ctx, person2: discord.Member):
