@@ -450,8 +450,9 @@ class Symbols(commands.Cog):
     async def inv(self, ctx, member:typing.Optional[discord.Member]):
         if member is None:
             member = ctx.author
-        embed = discord.Embed(color=discord.Color.brand_green(), title=f"{member.name}'s inventory", description="Sample text")
         user = Database.get_member(ctx.guild, member)
+        discovered = len(set(symbols) & set(user.keys()))
+        embed = discord.Embed(color=discord.Color.brand_green(), title=f"{member.name}'s inventory", description=f"Symbols discovered: {discovered}/{len(symbols)}")
         for i in symbols:
             if Database.has_symbol(ctx.guild, member, i):
                 embed.add_field(name=i, value=user[i])
@@ -459,7 +460,7 @@ class Symbols(commands.Cog):
 
     @commands.hybrid_command(brief="Allows you to get symbols.", help="Gives you 5-7 symbols. They can be One, Increment, or Inverse. Has a 10 minute cooldown.")
     async def getsymbol(self, ctx):
-        pool = base_symbols * 2
+        pool = base_symbols * 5
         for i in bonus_unlocks.keys():
             if Database.has_symbol(ctx.guild, ctx.author, i):
                 pool.append(bonus_unlocks[i])
