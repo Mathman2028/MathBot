@@ -71,7 +71,7 @@ recycle_results = base_symbols + ["Point"]
 bonus_unlocks = {
 "Complex Numbers": "Real Numbers",
 "Logarithm": "Multiplication",
-"Sphere": "Line Segment",
+"Pi": "Point",
 "Space": "Infinity",
 }
 
@@ -377,7 +377,18 @@ async def dungeon(ctx):
         return embed, view
     embed, view = await gen_embed()
     await ctx.send(embed=embed, view=view)
-        
+
+@bot.hybrid_command(brief="HTTP status code thingy", help="http cat real")
+async def http(ctx, code):
+    if not code.isdigit():
+        await ctx.send("thats not a number")
+        return
+    elif len(code) != 3:
+        await ctx.send("http codes are 3 characters long")
+        return
+    else:
+        await ctx.send("https://http.cat/" + code)
+
 async def guild_only(_, ctx):
     if ctx.guild is None:
         raise commands.NoPrivateMessage("No DMs!")
@@ -460,7 +471,7 @@ class Symbols(commands.Cog):
 
     @commands.hybrid_command(brief="Allows you to get symbols.", help="Gives you 5-7 symbols. They can be One, Increment, or Inverse. Has a 10 minute cooldown.")
     async def getsymbol(self, ctx):
-        pool = base_symbols * 5
+        pool = base_symbols * 3
         for i in bonus_unlocks.keys():
             if Database.has_symbol(ctx.guild, ctx.author, i):
                 pool.append(bonus_unlocks[i])
