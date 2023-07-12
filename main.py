@@ -365,9 +365,9 @@ async def dungeon(ctx):
                 num_symbols = (health + 2) // 3
                 for _ in range(num_symbols):
                     symbol = random.choice(dungeon_results)
-                    Database.add_symbol(ctx.guild, ctx.author, )
+                    Database.add_symbol(ctx.guild, ctx.author, symbol)
                     reward_text += symbol + "\n"
-                embed.add_field(name="Results", value=num_symbols)
+                embed.add_field(name="Results", value=reward_text)
                 await interaction.message.edit(embed=embed, view=None)
             win_button = ui.Button(emoji="💎", disabled=health == 0)
             win_button.callback = victory
