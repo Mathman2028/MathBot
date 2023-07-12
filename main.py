@@ -769,7 +769,7 @@ class Symbols(commands.Cog):
 @Symbols.donate.autocomplete("symbol")
 @Symbols.recycle.autocomplete("symbol")
 async def symbol_autocomplete(interaction, current):
-    return [app_commands.Choice(name=symbol, value=symbol) for symbol in symbols if current.lower() in symbol.lower() and Database.has_symbol(interaction.guild, interaction.user, symbol)]
+    return [app_commands.Choice(name=symbol + " (x" + str(Database.get_member(interaction.guild, interaction.user)[symbol]) + ")", value=symbol) for symbol in symbols if current.lower() in symbol.lower() and Database.has_symbol(interaction.guild, interaction.user, symbol)]
 Symbols.cog_check = guild_only
 
 class Achievements(commands.Cog):
