@@ -222,10 +222,6 @@ async def playchess(ctx, opponent: discord.Member):
             final += rank_str + "\n"
         return final
 
-        
-
-
-
     class ChessModal(ui.Modal):
         def __init__(self):
             super().__init__(title="Make a move")
@@ -766,6 +762,14 @@ class Symbols(commands.Cog):
                         person2offer[self.symbol.value.title()] = int(self.amount.value)
                 await interaction.response.defer()
                 await update_trade_embed(interaction)
+
+@Symbols.craft.autocomplete("sym1")
+@Symbols.craft.autocomplete("sym2")
+@Symbols.recipes.autocomplete("symbol")
+@Symbols.donate.autocomplete("symbol")
+@Symbols.recycle.autocomplete("symbol")
+async def symbol_autocomplete(interaction, current):
+    return [app_commands.Choice(name=symbol, value=symbol) for symbol in symbols if current.lower() in symbol.lower() and Database.has_symbol(interaction.guild, interaction.user, symbol)]
 Symbols.cog_check = guild_only
 
 class Achievements(commands.Cog):
