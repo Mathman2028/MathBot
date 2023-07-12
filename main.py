@@ -63,10 +63,15 @@ recipes = {("Increment", "Increment"): "Addition",
 ("Circle", "Line"): "Cone",
 ("Cone", "Plane"): "Conic Section",
 ("Plane", "Infinity"): "Space",
+("Set", "Addition"): "Union",
+("Set", "Multiplication"): "Intersection",
+("Real Numbers", "Real Numbers"): "Ordered Pair",
+("Set", "Ordered Pair"): "Function",
 }
 
 base_symbols = ["One", "Increment", "Inverse"]
 recycle_results = base_symbols + ["Point"]
+dungeon_results = base_symbols + ["Set"]
 
 bonus_unlocks = {
 "Complex Numbers": "Real Numbers",
@@ -75,7 +80,7 @@ bonus_unlocks = {
 "Space": "Infinity",
 }
 
-special_symbols = {"Point"}
+special_symbols = {"Point", "Set"}
 
 symbols = list(set(base_symbols) | set(recipes.values()) | special_symbols)
 symbols.sort()
@@ -290,7 +295,7 @@ async def dungeon(ctx):
         "Heal": "This room seems safe. You take some time to rest, healing 1 HP.",
         "Boss": "You see treasure, but a boss guards it. Good luck!"
     }
-    health = 10
+    health = 7
     bossfound = False
     class Room():
         def __init__(self, parent: "Room", type: typing.Optional[str] = None, exitcount: typing.Optional[int] = None):
@@ -359,7 +364,15 @@ async def dungeon(ctx):
                     return
                 await interaction.response.defer()
                 await Achievements.give_ach(ctx.guild, ctx.author, "Random", "dungeon", ctx.channel)
-                await interaction.message.edit(embed=discord.Embed(title="The Dungeon", description="You have won! Good job."), view=None)
+                embed = discord.Embed(title="The Dungeon", description="You have won! Good job.")
+                reward_text = ""
+                num_symbols = (health + 2) // 3
+                for _ in range(num_symbols):
+                    symbol = random.choice(dungeon_results)
+                    Database.add_symbol(ctx.guild, ctx.author, )
+                    reward_text += symbol + "\n"
+                embed.add_field(name="Results", value=num_symbols)
+                await interaction.message.edit(embed=embed, view=None)
             win_button = ui.Button(emoji="💎", disabled=health == 0)
             win_button.callback = victory
             view.add_item(win_button)
@@ -576,7 +589,7 @@ class Symbols(commands.Cog):
                 new_symbol = random.choice(recycle_results)
             output += new_symbol + "\n"
             Database.add_symbol(ctx.guild, ctx.author, new_symbol)
-        await ctx.send(discord.Embed(title="Recycle results", description=output))
+        await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Recycle results", description=output))
 
     @commands.hybrid_command(brief="Trade symbols with another member.", help="Does this really need an explanation?")
     async def trade(self, ctx, person2: discord.Member):
