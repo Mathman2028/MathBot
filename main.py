@@ -276,7 +276,7 @@ async def playchess(ctx, opponent: discord.Member):
     embed, view = await gen_embed()
     await ctx.send(embed=embed, view=view)
 
-@bot.hybrid_command(brief="Enter the dungeon", help="Enter a randomly generated dungeon with 10 HP. Good luck!")
+@bot.hybrid_command(brief="Enter the dungeon", help="Enter a randomly generated dungeon. Good luck!")
 async def dungeon(ctx):
     roomtypes = ["Enemy"] * 10 + ["Empty"] * 5 + ["Heal"] * 4
     emojis = {
@@ -533,7 +533,7 @@ class Symbols(commands.Cog):
         await ctx.send(f"You got {result} x{amt}!")
         await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "craft", ctx.channel)
         if result in bonus_unlocks.keys():
-            await ctx.send(f"Congratulations! Because you have {result}, you can now get {bonus_unlocks[result]} from m!getsymbol!")
+            await ctx.send(f"Congratulations! Because you have {result}, you can now get {bonus_unlocks[result]} from " + Symbols.getsymbol.mention)
             await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "bonus_unlock", ctx.channel)
 
     @commands.hybrid_command(brief="Shows recipes involving a symbol.")
