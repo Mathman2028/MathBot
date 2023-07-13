@@ -90,12 +90,14 @@ async def on_ready():
     print(f'We have logged in as {bot.user}')
     await bot.tree.sync()
 
-@bot.hybrid_command(brief="Repeats after you", help="Simply repeats your input. It doesn't get much simpler than that.")
+@bot.hybrid_command()
 async def echo(ctx, *, text):
+    """Repeats after you"""
     await ctx.send(text)
 
-@bot.hybrid_command(brief="Does simple calculations", help="Does the calculation specified. Allowed operators are +, -, *, /, and ^.")
+@bot.hybrid_command()
 async def calculate(ctx, num1: float, op, num2: float):
+    """Does simple calculations"""
     if op in ("+", "plus", "add"):
         await ctx.send(num1 + num2)
     elif op in ("-", "minus", "subtract"):
@@ -112,8 +114,9 @@ async def calculate(ctx, num1: float, op, num2: float):
     else:
         await ctx.send("Invalid operation!")
 
-@bot.hybrid_command(brief="A stupider version of calculate.", help="Same parameters as calculate, but it does the calculations wrong.")
+@bot.hybrid_command()
 async def stupidcalculator(ctx, num1: int, op, num2: int):
+    """Idiot calculator"""
     if num1 < 0 or num2 < 0:
         await ctx.send("huh?")
         return
@@ -175,6 +178,7 @@ async def easter_eggs(message):
 @bot.tree.context_menu(name="Quote")
 @app_commands.guild_only()
 async def msg_quote(interaction: discord.Interaction, message: discord.Message):
+    """Quote someone and have it be preserved in the quote command for the rest of time"""
     if message.author == interaction.user:
         await interaction.response.send_message("You can't quote yourself")
         return
@@ -185,8 +189,9 @@ async def msg_quote(interaction: discord.Interaction, message: discord.Message):
         guild_db["quotes"].append({"author": message.author.name, "content": message.content})
     await interaction.response.send_message(embed=discord.Embed(color=discord.Color.brand_green(), title=f"Quote from {message.author.name}", description=message.content))
 
-@bot.hybrid_command(brief="Displays a random quote", help="Displays a random quote from this server. Add some with the Quote context menu command!")
+@bot.hybrid_command()
 async def quote(ctx):
+    """Displays a random quote from your server selected by the Quote context menu command"""
     guild_db = Database.db[str(ctx.guild.id)]
     if "quotes" not in guild_db.keys():
         await ctx.send("There are no quotes! Right click or tap an hold on a message, then select Apps > Quote to make a quote.")
@@ -195,12 +200,14 @@ async def quote(ctx):
     author = random_quote["author"]
     await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title=f"Quote from {author}", description=random_quote["content"]))
 
-@bot.hybrid_command(brief="Get Cat", help="cat")
+@bot.hybrid_command()
 async def meow(ctx):
+    """Get Cat"""
     await ctx.send(f"http://placekitten.com/{random.randint(480,520)}/{random.randint(480,520)}")
 
-@bot.hybrid_command(brief="Play a game of chess", help="google en passant")
+@bot.hybrid_command()
 async def playchess(ctx, opponent: discord.Member):
+    """Play a game of chess"""
     if opponent == ctx.author:
         await ctx.send("Nope")
         await Achievements.give_ach(ctx.guild, ctx.author, "Random", "nofriends", ctx.channel)
@@ -276,8 +283,9 @@ async def playchess(ctx, opponent: discord.Member):
     embed, view = await gen_embed()
     await ctx.send(embed=embed, view=view)
 
-@bot.hybrid_command(brief="Enter the dungeon", help="Enter a randomly generated dungeon. Good luck!")
+@bot.hybrid_command()
 async def dungeon(ctx):
+    """Enter a random dungeon"""
     roomtypes = ["Enemy"] * 10 + ["Empty"] * 5 + ["Heal"] * 4
     emojis = {
         "Enemy": "💀",
@@ -387,8 +395,9 @@ async def dungeon(ctx):
     embed, view = await gen_embed()
     await ctx.send(embed=embed, view=view)
 
-@bot.hybrid_command(brief="HTTP status code thingy", help="http cat real")
+@bot.hybrid_command()
 async def http(ctx, code):
+    """HTTP status codes"""
     if not code.isdigit():
         await ctx.send("thats not a number")
         return
@@ -466,8 +475,9 @@ class Symbols(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.hybrid_command(brief="Displays your inventory.", help="Shows which symbols you have and how many.")
+    @commands.hybrid_command()
     async def inv(self, ctx, member:typing.Optional[discord.Member]):
+        """Displays your inventory"""
         if member is None:
             member = ctx.author
         user = Database.get_member(ctx.guild, member)
@@ -478,8 +488,9 @@ class Symbols(commands.Cog):
                 embed.add_field(name=i, value=user[i])
         await ctx.send(embed=embed)
 
-    @commands.hybrid_command(brief="Allows you to get symbols.", help="Gives you 5-7 symbols. They can be One, Increment, or Inverse. Has a 10 minute cooldown.")
+    @commands.hybrid_command()
     async def getsymbol(self, ctx):
+        """Get some base symbols every 10 minutes"""
         pool = base_symbols * 3
         for i in bonus_unlocks.keys():
             if Database.has_symbol(ctx.guild, ctx.author, i):
@@ -497,8 +508,9 @@ class Symbols(commands.Cog):
             await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Here's what you got", description=output))
             await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "first", ctx.channel)
 
-    @commands.hybrid_command(brief="Crafts two symbols together.", help="Crafts two symbols together to get a new symbol. An optional amount parameter allows you to craft in bulk.")
+    @commands.hybrid_command()
     async def craft(self, ctx, sym1: Symbol, sym2: Symbol, amt:int=1):
+        """Craft symbols to get better symbols"""
         if amt < 1:
             await ctx.send("Nope")
             return
@@ -536,8 +548,9 @@ class Symbols(commands.Cog):
             await ctx.send(f"Congratulations! Because you have {result}, you can now get {bonus_unlocks[result]} from " + Symbols.getsymbol.mention)
             await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "bonus_unlock", ctx.channel)
 
-    @commands.hybrid_command(brief="Shows recipes involving a symbol.")
+    @commands.hybrid_command()
     async def recipes(self, ctx, symbol: Symbol):
+        """Tells you what can be crafted with or to make a certain symbol"""
         output = ""
         user_db = Database.get_member(ctx.guild, ctx.author)
         async def process_symbol(symbol):
@@ -551,8 +564,9 @@ class Symbols(commands.Cog):
             output += f"{await process_symbol(k[0])} + {await process_symbol(k[1])} = {await process_symbol(v)}\n"
         await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title=f"Recipes with {symbol}", description=output))
 
-    @commands.hybrid_command(brief="Allows you to give symbols to others.", help="Donates symbols. An optional argument allows you to donate in bulk.")
+    @commands.hybrid_command()
     async def donate(self, ctx, reciever: discord.Member, symbol: Symbol, amount:int=1):
+        """Give away your symbols"""
         if amount < 1:
             await ctx.send("You can't do that")
             return
@@ -569,8 +583,9 @@ class Symbols(commands.Cog):
         await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Donation successful", description=f"Successfully transferred {symbol} x{amount} to {reciever.name}."))
         await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "donate", ctx.channel)
 
-    @commands.hybrid_command(brief="Recycle multiple of the same symbol to get other symbols!", help="Recycles multiples of symbols to get others. You will always get one less symbol than you put in.")
+    @commands.hybrid_command()
     async def recycle(self, ctx, symbol: Symbol, amount:int=2):
+        """Recycle n symbols, get n-1 symbols"""
         if amount < 2:
             await ctx.send("Amount must be 2 or greater.")
             return
@@ -587,8 +602,9 @@ class Symbols(commands.Cog):
             Database.add_symbol(ctx.guild, ctx.author, new_symbol)
         await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Recycle results", description=output))
 
-    @commands.hybrid_command(brief="Trade symbols with another member.", help="Does this really need an explanation?")
+    @commands.hybrid_command()
     async def trade(self, ctx, person2: discord.Member):
+        """Trade your symbols"""
         # thanks to milenakos for the code
         person1 = ctx.author
         if person1 == person2:
@@ -805,8 +821,9 @@ class Achievements(commands.Cog):
             embed = discord.Embed(color=discord.Color.brand_green(), title="Achievement get: " + ach_data["name"], description=ach_data["desc"])
             embed.set_footer(text=f"Achieved by {member.name}")
             await messageable.send(embed=embed)
-    @commands.hybrid_command(brief="See your achievements", help="Lists your achievements by category")
+    @commands.hybrid_command()
     async def achs(self, ctx):
+        """See your achievements"""
         Achievements.register(ctx.guild, ctx.author)
         user_db = Database.get_member(ctx.guild, ctx.author)["achs"]
         category = "Symbols"
