@@ -350,9 +350,11 @@ async def http(ctx, code):
 @bot.hybrid_command()
 async def reload(ctx, ext):
     await bot.reload_extension(ext)
+    await bot.tree.sync()
     await ctx.send("Reloaded!")
 
 database.Database.load()
+achievements.Achievements.load()
 
 asyncio.run(bot.load_extension("symbols"))
 asyncio.run(bot.load_extension("achievements"))

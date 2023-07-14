@@ -162,7 +162,7 @@ class Symbols(commands.Cog):
         await ctx.send(f"You got {result} x{amt}!")
         await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "craft", ctx.channel)
         if result in bonus_unlocks.keys():
-            await ctx.send(f"Congratulations! Because you have {result}, you can now get {bonus_unlocks[result]} from " + Symbols.getsymbol.mention)
+            await ctx.send(f"Congratulations! Because you have {result}, you can now get {bonus_unlocks[result]} from getsymbol!")
             await Achievements.give_ach(ctx.guild, ctx.author, "Symbols", "bonus_unlock", ctx.channel)
 
     @commands.hybrid_command()
@@ -180,6 +180,17 @@ class Symbols(commands.Cog):
                 continue
             output += f"{await process_symbol(k[0])} + {await process_symbol(k[1])} = {await process_symbol(v)}\n"
         await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title=f"Recipes with {symbol}", description=output))
+
+    @commands.hybrid_command()
+    async def hint(self, ctx):
+        """Shows a list of recipes you should try next"""
+        output = ""
+        user_db = Database.get_member(ctx.guild, ctx.author)
+        for k, v in recipes.items():
+            if k[0] in user_db.keys() and k[1] in user_db.keys() and v not in user_db.keys():
+                output += f"{k[0]} + {k[1]}\n"
+        output = "Nothing." if not output else output
+        await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="New recipes", description=output))
 
     @commands.hybrid_command()
     async def donate(self, ctx, reciever: discord.Member, symbol: Symbol, amount:int=1):
