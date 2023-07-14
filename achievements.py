@@ -78,3 +78,6 @@ class Achievements(commands.Cog):
         embed, view = await gen_embed()
         await ctx.send(embed=embed, view=view)
 Achievements.cog_check = Achievements.guild_only
+
+async def setup(bot):
+    await bot.add_cog(Achievements(bot))

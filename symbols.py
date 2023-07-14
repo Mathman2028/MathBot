@@ -404,3 +404,6 @@ class Symbols(commands.Cog):
 async def symbol_autocomplete(interaction, current):
     return [app_commands.Choice(name=symbol + " (x" + str(Database.get_member(interaction.guild, interaction.user)[symbol]) + ")", value=symbol) for symbol in symbols if current.lower() in symbol.lower() and Database.has_symbol(interaction.guild, interaction.user, symbol)]
 Symbols.cog_check = Symbols.guild_only
+
+async def setup(bot):
+    await bot.add_cog(Symbols(bot))

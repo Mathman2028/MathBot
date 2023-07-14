@@ -346,10 +346,16 @@ async def http(ctx, code):
     else:
         await ctx.send("https://http.cat/" + code)
 
+@commands.is_owner()
+@bot.hybrid_command()
+async def reload(ctx, ext):
+    await bot.reload_extension(ext)
+    await ctx.send("Reloaded!")
+
 database.Database.load()
 
-asyncio.run(bot.add_cog(symbols.Symbols(bot)))
-asyncio.run(bot.add_cog(achievements.Achievements(bot)))
+asyncio.run(bot.load_extension("symbols"))
+asyncio.run(bot.load_extension("achievements"))
 
 async def on_command_error(ctx, error):
     if isinstance(error, commands.BadArgument):
