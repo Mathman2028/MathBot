@@ -358,6 +358,7 @@ achievements.Achievements.load()
 
 asyncio.run(bot.load_extension("symbols"))
 asyncio.run(bot.load_extension("achievements"))
+asyncio.run(bot.load_extension("database"))
 
 async def on_command_error(ctx, error):
     if isinstance(error, commands.BadArgument):

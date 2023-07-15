@@ -1,8 +1,12 @@
+import discord
 from discord.ext import commands
+from discord import ui
 import json
 import time
 
 class Database(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
     @classmethod
     def load(cls):
         with open("db.json", "r") as f:
@@ -47,3 +51,11 @@ class Database(commands.Cog):
     def has_symbol(cls, server, member, symbol, count=1):
         user_db = Database.get_member(server, member)
         return symbol in user_db.keys() and user_db[symbol] >= count
+    @commands.hybrid_command()
+    async def cleardata(ctx):
+        del Database.db[str(ctx.guild.id)][str(ctx.author.id)]
+        Database.save()
+        await ctx.send("Your data has been deleted. I hope you don't regret this...")
+
+async def setup(bot):
+    bot.add_cog(Database(bot))
