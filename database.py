@@ -58,4 +58,4 @@ class Database(commands.Cog):
         await ctx.send("Your data has been deleted. I hope you don't regret this...")
 
 async def setup(bot):
-    bot.add_cog(Database(bot))
+    await bot.add_cog(Database(bot))
