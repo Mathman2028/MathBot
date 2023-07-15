@@ -63,6 +63,7 @@ class Achievements(commands.Cog):
                     nonlocal new_category
                     if interaction.user != ctx.author:
                         await interaction.response.send_message("Not your achievement embed", ephemeral=True)
+                        await Achievements.give_ach(interaction.guild, interaction.user, "Random", "nope", interaction.channel)
                     category = new_category
                     embed, view = await gen_embed()
                     await interaction.response.edit_message(embed=embed, view=view)
