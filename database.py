@@ -52,7 +52,7 @@ class Database(commands.Cog):
         user_db = Database.get_member(server, member)
         return symbol in user_db.keys() and user_db[symbol] >= count
     @commands.hybrid_command()
-    async def cleardata(ctx):
+    async def cleardata(self, ctx):
         del Database.db[str(ctx.guild.id)][str(ctx.author.id)]
         Database.save()
         await ctx.send("Your data has been deleted. I hope you don't regret this...")
