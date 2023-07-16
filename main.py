@@ -89,7 +89,7 @@ async def stupidcalculator(ctx, num1: int, op, num2: int):
 
 @bot.listen("on_message")
 async def easter_eggs(message):
-    Achievements = bot.get_cog("Achievements")
+    achievements = bot.get_cog("Achievements")
     if message.author == bot.user:
         return
     if "cellua bad" in message.content.lower():
@@ -111,7 +111,7 @@ async def easter_eggs(message):
             await message.add_reaction("⬆️")
             await message.reference.resolved.add_reaction("⬆️")
             if message.author == message.reference.resolved.author:
-                await Achievements.give_ach(message.guild, message.author, "Random", "friendlyfire", message.channel)
+                await achievements.give_ach(message.guild, message.author, "Random", "friendlyfire", message.channel)
     if re.search("\d+\.\d+\.\d+\.\d+", message.content):
         await message.reply(f"{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}")
 
@@ -119,11 +119,11 @@ async def easter_eggs(message):
 @app_commands.guild_only()
 async def msg_quote(interaction: discord.Interaction, message: discord.Message):
     """Quote someone and have it be preserved in the quote command for the rest of time"""
-    Database = bot.get_cog("Database")
+    database = bot.get_cog("Database")
     if message.author == interaction.user:
         await interaction.response.send_message("You can't quote yourself")
         return
-    guild_db = Database.db[str(interaction.guild.id)]
+    guild_db = database.db[str(interaction.guild.id)]
     if "quotes" not in guild_db.keys():
         guild_db["quotes"] = []
     if {"author": message.author.name, "content": message.content} not in guild_db["quotes"]:
@@ -133,8 +133,8 @@ async def msg_quote(interaction: discord.Interaction, message: discord.Message):
 @bot.hybrid_command()
 async def quote(ctx):
     """Displays a random quote from your server selected by the Quote context menu command"""
-    Database = bot.get_cog("Database")
-    guild_db = Database.db[str(ctx.guild.id)]
+    database = bot.get_cog("Database")
+    guild_db = database.db[str(ctx.guild.id)]
     if "quotes" not in guild_db.keys():
         await ctx.send("There are no quotes! Right click or tap an hold on a message, then select Apps > Quote to make a quote.")
         return
@@ -150,10 +150,10 @@ async def meow(ctx):
 @bot.hybrid_command()
 async def playchess(ctx, opponent: discord.Member):
     """Play a game of chess"""
-    Achievements = bot.get_cog("Achievements")
+    achievements = bot.get_cog("Achievements")
     if opponent == ctx.author:
         await ctx.send("Nope")
-        await Achievements.give_ach(ctx.guild, ctx.author, "Random", "nofriends", ctx.channel)
+        await achievements.give_ach(ctx.guild, ctx.author, "Random", "nofriends", ctx.channel)
         return
 
     board = chess.Board()
@@ -187,7 +187,7 @@ async def playchess(ctx, opponent: discord.Member):
         async def on_submit(self, interaction):
             move = board.push_san(self.move.value)
             if board.is_en_passant(move):
-                await Achievements.give_ach(interaction.guild, interaction.user, "Random", "enpassant", interaction.channel)
+                await achievements.give_ach(interaction.guild, interaction.user, "Random", "enpassant", interaction.channel)
             await interaction.response.defer()
             await update_chess_embed(interaction)
     
@@ -229,8 +229,8 @@ async def playchess(ctx, opponent: discord.Member):
 @bot.hybrid_command()
 async def dungeon(ctx):
     """Enter a random dungeon"""
-    Database = bot.get_cog("Database")
-    Achievements = bot.get_cog("Achievements")
+    database = bot.get_cog("Database")
+    achievements = bot.get_cog("Achievements")
     roomtypes = ["Enemy"] * 10 + ["Empty"] * 5 + ["Heal"] * 4
     emojis = {
         "Enemy": "💀",
@@ -279,7 +279,7 @@ async def dungeon(ctx):
             nonlocal currentroom, room
             if interaction.user != ctx.author:
                 await interaction.response.send_message("Start your own dungeon", ephemeral=True)
-                await Achievements.give_ach(ctx.guild, interaction.user, "Random", "nope", ctx.channel)
+                await achievements.give_ach(ctx.guild, interaction.user, "Random", "nope", ctx.channel)
                 return
             currentroom = room
             embed, view = await gen_embed()
@@ -309,16 +309,16 @@ async def dungeon(ctx):
             async def victory(interaction):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("Start your own dungeon", ephemeral=True)
-                    await Achievements.give_ach(ctx.guild, interaction.user, "Random", "nope", ctx.channel)
+                    await achievements.give_ach(ctx.guild, interaction.user, "Random", "nope", ctx.channel)
                     return
                 await interaction.response.defer()
-                await Achievements.give_ach(ctx.guild, ctx.author, "Random", "dungeon", ctx.channel)
+                await achievements.give_ach(ctx.guild, ctx.author, "Random", "dungeon", ctx.channel)
                 embed = discord.Embed(title="The Dungeon", description="You have won! Good job.")
                 reward_text = ""
                 num_symbols = (health + 2) // 3
                 for _ in range(num_symbols):
                     symbol = random.choice(symbols.dungeon_results)
-                    Database.add_symbol(ctx.guild, ctx.author, symbol)
+                    database.add_symbol(ctx.guild, ctx.author, symbol)
                     reward_text += symbol + "\n"
                 embed.add_field(name="Results", value=reward_text)
                 await interaction.message.edit(embed=embed, view=None)
