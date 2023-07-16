@@ -7,9 +7,7 @@ import asyncio
 import typing
 import re
 import chess
-import database
 import symbols
-import achievements
 
 intents = discord.Intents.default()
 intents.message_content = True
