@@ -367,6 +367,7 @@ bot.get_cog("Database").load()
 bot.get_cog("Achievements").load()
 
 async def on_command_error(ctx, error):
+    print(error)
     if isinstance(error, commands.BadArgument):
         await ctx.send(error.args[0])
     elif isinstance(error, commands.TooManyArguments):
@@ -381,6 +382,7 @@ async def on_command_error(ctx, error):
         await ctx.send(embed=discord.Embed(title="An error occured!", description=error, color=discord.Color.red()))
 @bot.tree.error
 async def on_app_command_error(interaction, error):
+    print(error)
     if isinstance(error, app_commands.TransformerError):
         await interaction.response.send_message("goofy ahh arguments")
     elif isinstance(error, app_commands.CheckFailure):
