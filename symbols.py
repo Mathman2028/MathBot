@@ -5,8 +5,6 @@ import random
 import math
 from discord import ui
 from discord import app_commands
-from database import Database
-from achievements import Achievements
 
 recipes = {("Increment", "Increment"): "Addition",
 ("Increment", "Inverse"): "Decrement",
@@ -70,8 +68,7 @@ symbols = list(set(base_symbols) | set(recipes.values()) | special_symbols)
 symbols.sort()
 
 class Symbols(commands.Cog):
-    @classmethod
-    async def guild_only(_, ctx):
+    async def guild_only(self, ctx):
         if ctx.guild is None:
             raise commands.NoPrivateMessage("No DMs!")
         return True
@@ -95,6 +92,7 @@ class Symbols(commands.Cog):
     @commands.hybrid_command()
     async def inv(self, ctx, member:typing.Optional[discord.Member]):
         """Displays your inventory"""
+        Database = self.bot.get_cog("Database")
         if member is None:
             member = ctx.author
         user = Database.get_member(ctx.guild, member)
@@ -108,6 +106,8 @@ class Symbols(commands.Cog):
     @commands.hybrid_command()
     async def getsymbol(self, ctx):
         """Get some base symbols every 10 minutes"""
+        Database = self.bot.get_cog("Database")
+        Achievements = self.bot.get_cog("Achievements")
         pool = base_symbols * 3
         for i in bonus_unlocks.keys():
             if Database.has_symbol(ctx.guild, ctx.author, i):
@@ -128,6 +128,8 @@ class Symbols(commands.Cog):
     @commands.hybrid_command()
     async def craft(self, ctx, sym1: Symbol, sym2: Symbol, amt:int=1):
         """Craft symbols to get better symbols"""
+        Database = self.bot.get_cog("Database")
+        Achievements = self.bot.get_cog("Achievements")
         if amt < 1:
             await ctx.send("Nope")
             return
@@ -168,6 +170,7 @@ class Symbols(commands.Cog):
     @commands.hybrid_command()
     async def recipes(self, ctx, symbol: Symbol):
         """Tells you what can be crafted with or to make a certain symbol"""
+        Database = self.bot.get_cog("Database")
         output = ""
         user_db = Database.get_member(ctx.guild, ctx.author)
         async def process_symbol(symbol):
@@ -184,6 +187,7 @@ class Symbols(commands.Cog):
     @commands.hybrid_command()
     async def hint(self, ctx):
         """Shows a list of recipes you should try next"""
+        Database = self.bot.get_cog("Database")
         output = ""
         user_db = Database.get_member(ctx.guild, ctx.author)
         for k, v in recipes.items():
@@ -195,6 +199,8 @@ class Symbols(commands.Cog):
     @commands.hybrid_command()
     async def donate(self, ctx, reciever: discord.Member, symbol: Symbol, amount:int=1):
         """Give away your symbols"""
+        Database = self.bot.get_cog("Database")
+        Achievements = self.bot.get_cog("Achivements")
         if amount < 1:
             await ctx.send("You can't do that")
             return
@@ -214,6 +220,7 @@ class Symbols(commands.Cog):
     @commands.hybrid_command()
     async def recycle(self, ctx, symbol: Symbol, amount:int=2):
         """Recycle n symbols, get n-1 symbols"""
+        Database = self.bot.get_cog("Database")
         if amount < 2:
             await ctx.send("Amount must be 2 or greater.")
             return
@@ -232,6 +239,8 @@ class Symbols(commands.Cog):
 
     @commands.hybrid_command()
     async def trade(self, ctx, person2: discord.Member):
+        Database = self.bot.get_cog("Database")
+        Achievements = self.bot.get_cog("Achievements")
         """Trade your symbols"""
         # thanks to milenakos for the code
         person1 = ctx.author
@@ -407,14 +416,16 @@ class Symbols(commands.Cog):
                 await interaction.response.defer()
                 await update_trade_embed(interaction)
 
-@Symbols.craft.autocomplete("sym1")
-@Symbols.craft.autocomplete("sym2")
-@Symbols.recipes.autocomplete("symbol")
-@Symbols.donate.autocomplete("symbol")
-@Symbols.recycle.autocomplete("symbol")
-async def symbol_autocomplete(interaction, current):
-    return [app_commands.Choice(name=symbol + " (x" + str(Database.get_member(interaction.guild, interaction.user)[symbol]) + ")", value=symbol) for symbol in symbols if current.lower() in symbol.lower() and Database.has_symbol(interaction.guild, interaction.user, symbol)]
 Symbols.cog_check = Symbols.guild_only
 
 async def setup(bot):
     await bot.add_cog(Symbols(bot))
+    Database = bot.get_cog("Database")
+    @Symbols.craft.autocomplete("sym1")
+    @Symbols.craft.autocomplete("sym2")
+    @Symbols.recipes.autocomplete("symbol")
+    @Symbols.donate.autocomplete("symbol")
+    @Symbols.recycle.autocomplete("symbol")
+    async def symbol_autocomplete(interaction, current):
+        return [app_commands.Choice(name=symbol + " (x" + str(Database.get_member(interaction.guild, interaction.user)[symbol]) + ")", value=symbol) for symbol in symbols if current.lower() in symbol.lower() and Database.has_symbol(interaction.guild, interaction.user, symbol)]
+    
