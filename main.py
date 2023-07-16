@@ -119,7 +119,7 @@ async def easter_eggs(message):
 @app_commands.guild_only()
 async def msg_quote(interaction: discord.Interaction, message: discord.Message):
     """Quote someone and have it be preserved in the quote command for the rest of time"""
-    Database = bot.get_cog(Database)
+    Database = bot.get_cog("Database")
     if message.author == interaction.user:
         await interaction.response.send_message("You can't quote yourself")
         return
