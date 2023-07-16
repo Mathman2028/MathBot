@@ -68,6 +68,7 @@ symbols = list(set(base_symbols) | set(recipes.values()) | special_symbols)
 symbols.sort()
 
 class Symbols(commands.Cog):
+    """All the commands relating to the bot's symbol system."""
     async def guild_only(self, ctx):
         if ctx.guild is None:
             raise commands.NoPrivateMessage("No DMs!")

@@ -5,6 +5,7 @@ import json
 import time
 
 class Database(commands.Cog):
+    """The base functions dealing with handling the database."""
     def __init__(self, bot):
         self.bot = bot
     @classmethod

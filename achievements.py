@@ -4,6 +4,7 @@ from discord import ui
 import json
 
 class Achievements(commands.Cog):
+    """Everything relating to giving, getting, viewing, and checking achievements."""
     async def guild_only(self, ctx):
         if ctx.guild is None:
             raise commands.NoPrivateMessage("No DMs!")
