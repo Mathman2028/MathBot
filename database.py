@@ -54,6 +54,7 @@ class Database(commands.Cog):
         return symbol in user_db.keys() and user_db[symbol] >= count
     @commands.hybrid_command()
     async def cleardata(self, ctx):
+        """Clears your data. CANNOT BE UNDONE."""
         del Database.db[str(ctx.guild.id)][str(ctx.author.id)]
         Database.save()
         await ctx.send("Your data has been deleted. I hope you don't regret this...")
