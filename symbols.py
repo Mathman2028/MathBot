@@ -416,17 +416,18 @@ class Symbols(commands.Cog):
                         person2offer[self.symbol.value.title()] = int(self.amount.value)
                 await interaction.response.defer()
                 await update_trade_embed(interaction)
+    
+    @craft.autocomplete("sym1")
+    @craft.autocomplete("sym2")
+    @recipes.autocomplete("symbol")
+    @donate.autocomplete("symbol")
+    @recycle.autocomplete("symbol")
+    async def symbol_autocomplete(self, interaction, current):
+        database = self.bot.get_cog("Database")
+        return [app_commands.Choice(name=symbol + " (x" + str(database.get_member(interaction.guild, interaction.user)[symbol]) + ")", value=symbol) for symbol in symbols if current.lower() in symbol.lower() and database.has_symbol(interaction.guild, interaction.user, symbol)]
 
 Symbols.cog_check = Symbols.guild_only
 
 async def setup(bot):
     await bot.add_cog(Symbols(bot))
-    database = bot.get_cog("Database")
-    @Symbols.craft.autocomplete("sym1")
-    @Symbols.craft.autocomplete("sym2")
-    @Symbols.recipes.autocomplete("symbol")
-    @Symbols.donate.autocomplete("symbol")
-    @Symbols.recycle.autocomplete("symbol")
-    async def symbol_autocomplete(interaction, current):
-        return [app_commands.Choice(name=symbol + " (x" + str(database.get_member(interaction.guild, interaction.user)[symbol]) + ")", value=symbol) for symbol in symbols if current.lower() in symbol.lower() and database.has_symbol(interaction.guild, interaction.user, symbol)]
     
