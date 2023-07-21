@@ -1,6 +1,6 @@
 # MathBot [![Discord server](https://img.shields.io/discord/1119928044811976744?label=discord&logo=discord)](https://discord.gg/c3TxDj6DYa)
 
-A fun discord bot made by @mathman2028. Invite [here](https://discord.gg/c3TxDj6DYa).
+A fun discord bot made by @mathman2028. [Discord Server](https://discord.gg/c3TxDj6DYa) [Bot Invite](https://discord.com/api/oauth2/authorize?client_id=1119928094418018354&permissions=3136&scope=bot)
 
 ## Setup
 
@@ -23,4 +23,4 @@ To add new symbols, simply create a recipe for them in the `recipes` dictionary 
 ### New achievements
 
 If you want to add new achievements, first add your achievement to `achs.json`. The format there should be pretty self-explanatory.
-Then, in order to grant the achievement to someone, call `achievements.Achievements.give_ach(guild, member, category, ach, messageable)`. You can look at examples in the code if any of these parameters are unclear.
+Then, in order to grant the achievement to someone, call `Achievements.give_ach(guild, member, category, ach, messageable)`. You can look at examples in the code if any of these parameters are unclear.
