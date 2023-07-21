@@ -338,18 +338,6 @@ async def dungeon(ctx: commands.Context):
     embed, view = await gen_embed()
     await ctx.send(embed=embed, view=view)
 
-@bot.hybrid_command()
-async def http(ctx: commands.Context, code: str):
-    """HTTP status codes"""
-    if not code.isdigit():
-        await ctx.send("thats not a number")
-        return
-    elif len(code) != 3:
-        await ctx.send("http codes are 3 characters long")
-        return
-    else:
-        await ctx.send("https://http.cat/" + code)
-
 @commands.is_owner()
 @bot.hybrid_command()
 async def reload(ctx: commands.Context, ext: str):
