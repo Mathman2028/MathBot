@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import typing
 import random
 import math
 from discord import ui
