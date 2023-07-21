@@ -69,13 +69,13 @@ symbols.sort()
 
 class Symbols(commands.Cog):
     """All the commands relating to the bot's symbol system."""
-    async def guild_only(self, ctx):
+    async def guild_only(self, ctx: commands.Context):
         if ctx.guild is None:
             raise commands.NoPrivateMessage("No DMs!")
         return True
     
     class Symbol(commands.Converter):
-        async def convert(self, ctx, argument):
+        async def convert(self, ctx: commands.Context, argument: str):
             if not argument.title() in symbols:
                 possible = []
                 for i in symbols:
@@ -87,11 +87,11 @@ class Symbols(commands.Cog):
                     raise commands.BadArgument(message=f"{argument} isn't a valid symbol!")
             return argument.title()
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.hybrid_command()
-    async def inv(self, ctx, member:typing.Optional[discord.Member]):
+    async def inv(self, ctx: commands.Context, member: discord.Member | None):
         """Displays your inventory"""
         database = self.bot.get_cog("Database")
         if member is None:
@@ -105,7 +105,7 @@ class Symbols(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.hybrid_command()
-    async def getsymbol(self, ctx):
+    async def getsymbol(self, ctx: commands.Context):
         """Get some base symbols every 10 minutes"""
         database = self.bot.get_cog("Database")
         achievements = self.bot.get_cog("Achievements")
@@ -127,7 +127,7 @@ class Symbols(commands.Cog):
             await achievements.give_ach(ctx.guild, ctx.author, "Symbols", "first", ctx.channel)
 
     @commands.hybrid_command()
-    async def craft(self, ctx, sym1: Symbol, sym2: Symbol, amt:int=1):
+    async def craft(self, ctx: commands.Context, sym1: Symbol, sym2: Symbol, amt: int = 1):
         """Craft symbols to get better symbols"""
         database = self.bot.get_cog("Database")
         achievements = self.bot.get_cog("Achievements")
@@ -169,7 +169,7 @@ class Symbols(commands.Cog):
             await achievements.give_ach(ctx.guild, ctx.author, "Symbols", "bonus_unlock", ctx.channel)
 
     @commands.hybrid_command()
-    async def recipes(self, ctx, symbol: Symbol):
+    async def recipes(self, ctx: commands.Context, symbol: Symbol):
         """Tells you what can be crafted with or to make a certain symbol"""
         database = self.bot.get_cog("Database")
         output = ""
@@ -186,7 +186,7 @@ class Symbols(commands.Cog):
         await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title=f"Recipes with {symbol}", description=output))
 
     @commands.hybrid_command()
-    async def hint(self, ctx):
+    async def hint(self, ctx: commands.Context):
         """Shows a list of recipes you should try next"""
         database = self.bot.get_cog("Database")
         output = ""
@@ -198,7 +198,7 @@ class Symbols(commands.Cog):
         await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="New recipes", description=output))
 
     @commands.hybrid_command()
-    async def donate(self, ctx, reciever: discord.Member, symbol: Symbol, amount:int=1):
+    async def donate(self, ctx: commands.Context, reciever: discord.Member, symbol: Symbol, amount: int = 1):
         """Give away your symbols"""
         database = self.bot.get_cog("Database")
         achievements = self.bot.get_cog("Achivements")
@@ -219,7 +219,7 @@ class Symbols(commands.Cog):
         await achievements.give_ach(ctx.guild, ctx.author, "Symbols", "donate", ctx.channel)
 
     @commands.hybrid_command()
-    async def recycle(self, ctx, symbol: Symbol, amount:int=2):
+    async def recycle(self, ctx: commands.Context, symbol: Symbol, amount:int=2):
         """Recycle n symbols, get n-1 symbols"""
         database = self.bot.get_cog("Database")
         if amount < 2:
@@ -239,7 +239,7 @@ class Symbols(commands.Cog):
         await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Recycle results", description=output))
 
     @commands.hybrid_command()
-    async def trade(self, ctx, person2: discord.Member):
+    async def trade(self, ctx: commands.Context, person2: discord.Member):
         database = self.bot.get_cog("Database")
         achievements = self.bot.get_cog("Achievements")
         """Trade your symbols"""
@@ -254,7 +254,7 @@ class Symbols(commands.Cog):
         person1offer = {}
         person2offer = {}
 
-        async def denytrade(interaction):
+        async def denytrade(interaction: discord.Interaction):
             nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
             if interaction.user != person1 and interaction.user != person2:
                 await interaction.response.send_message("no", ephemeral = True)
@@ -263,7 +263,7 @@ class Symbols(commands.Cog):
             person1offer = {}
             person2offer = {}
             await interaction.message.edit(content=f"Trade cancelled by <@{interaction.user.id}>", embed=None, view=None)
-        async def accepttrade(interaction):
+        async def accepttrade(interaction: discord.Interaction):
             nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
             if interaction.user != person1 and interaction.user != person2:
                 await interaction.response.send_message("no", ephemeral = True)
@@ -302,7 +302,7 @@ class Symbols(commands.Cog):
                 database.save()
 
                 await interaction.message.edit(content="Trade finished!", view=None, embed=None)
-        async def offertrade(interaction):
+        async def offertrade(interaction: discord.Interaction):
             nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
             if interaction.user != person1 and interaction.user != person2:
                 await interaction.response.send_message("no", ephemeral = True)
@@ -314,7 +314,7 @@ class Symbols(commands.Cog):
                 currentuser = 2
             await handle_modal(currentuser, interaction)
 
-        async def handle_modal(currentuser, interaction):
+        async def handle_modal(currentuser: int, interaction: discord.Interaction):
             modal = TradeModal(currentuser)
             await interaction.response.send_modal(modal)
 
@@ -355,12 +355,12 @@ class Symbols(commands.Cog):
         embed, view = await gen_embed()
         await ctx.send(embed=embed, view=view)
 
-        async def update_trade_embed(interaction):
+        async def update_trade_embed(interaction: discord.Interaction):
             embed, view = await gen_embed()
             await interaction.message.edit(embed=embed, view=view)
 
         class TradeModal(ui.Modal):
-            def __init__(self, currentuser):
+            def __init__(self, currentuser: int):
                 super().__init__(
                     title = "Add symbols to the trade",
                     timeout = 5 * 60 # 5 minutes
@@ -383,7 +383,7 @@ class Symbols(commands.Cog):
                 )
                 self.add_item(self.amount)
 
-            async def on_submit(self, interaction):
+            async def on_submit(self, interaction: discord.Interaction):
                 nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
                 try:
                     if int(self.amount.value) <= 0:
@@ -422,12 +422,12 @@ class Symbols(commands.Cog):
     @recipes.autocomplete("symbol")
     @donate.autocomplete("symbol")
     @recycle.autocomplete("symbol")
-    async def symbol_autocomplete(self, interaction, current):
+    async def symbol_autocomplete(self, interaction: discord.Interaction, current: str):
         database = self.bot.get_cog("Database")
         return [app_commands.Choice(name=symbol + " (x" + str(database.get_member(interaction.guild, interaction.user)[symbol]) + ")", value=symbol) for symbol in symbols if current.lower() in symbol.lower() and database.has_symbol(interaction.guild, interaction.user, symbol)]
 
 Symbols.cog_check = Symbols.guild_only
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(Symbols(bot))
     

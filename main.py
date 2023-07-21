@@ -28,12 +28,12 @@ async def on_ready():
     await bot.tree.sync()
 
 @bot.hybrid_command()
-async def echo(ctx, *, text):
+async def echo(ctx: commands.Context, *, text: str):
     """Repeats after you"""
     await ctx.send(text)
 
 @bot.hybrid_command()
-async def calculate(ctx, num1: float, op, num2: float):
+async def calculate(ctx: commands.Context, num1: float, op: typing.Literal["+", "-", "*", "/", "^"], num2: float):
     """Does simple calculations"""
     if op in ("+", "plus", "add"):
         await ctx.send(num1 + num2)
@@ -52,7 +52,7 @@ async def calculate(ctx, num1: float, op, num2: float):
         await ctx.send("Invalid operation!")
 
 @bot.hybrid_command()
-async def stupidcalculator(ctx, num1: int, op, num2: int):
+async def stupidcalculator(ctx: commands.Context, num1: int, op: typing.Literal["+", "-", "*", "/", "^"], num2: int):
     """Idiot calculator"""
     if num1 < 0 or num2 < 0:
         await ctx.send("huh?")
@@ -86,7 +86,7 @@ async def stupidcalculator(ctx, num1: int, op, num2: int):
         await ctx.send("Invalid operation!")
 
 @bot.listen("on_message")
-async def easter_eggs(message):
+async def easter_eggs(message: discord.Message):
     achievements = bot.get_cog("Achievements")
     if message.author == bot.user:
         return
@@ -129,7 +129,7 @@ async def msg_quote(interaction: discord.Interaction, message: discord.Message):
     await interaction.response.send_message(embed=discord.Embed(color=discord.Color.brand_green(), title=f"Quote from {message.author.name}", description=message.content))
 
 @bot.hybrid_command()
-async def quote(ctx):
+async def quote(ctx: commands.Context):
     """Displays a random quote from your server selected by the Quote context menu command"""
     database = bot.get_cog("Database")
     guild_db = database.db[str(ctx.guild.id)]
@@ -141,12 +141,12 @@ async def quote(ctx):
     await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title=f"Quote from {author}", description=random_quote["content"]))
 
 @bot.hybrid_command()
-async def meow(ctx):
+async def meow(ctx: commands.Context):
     """Get Cat"""
     await ctx.send(f"http://placekitten.com/{random.randint(480,520)}/{random.randint(480,520)}")
 
 @bot.hybrid_command()
-async def playchess(ctx, opponent: discord.Member):
+async def playchess(ctx: commands.Context, opponent: discord.Member):
     """Play a game of chess"""
     achievements = bot.get_cog("Achievements")
     if opponent == ctx.author:
@@ -225,7 +225,7 @@ async def playchess(ctx, opponent: discord.Member):
     await ctx.send(embed=embed, view=view)
 
 @bot.hybrid_command()
-async def dungeon(ctx):
+async def dungeon(ctx: commands.Context):
     """Enter a random dungeon"""
     database = bot.get_cog("Database")
     achievements = bot.get_cog("Achievements")
@@ -271,9 +271,9 @@ async def dungeon(ctx):
             for _ in range(self.exitcount):
                 self.exits.append(Room(self))
     currentroom = Room(None, "Empty", 2)
-    async def gen_callback(room):
+    async def gen_callback(room: Room):
         nonlocal currentroom
-        async def callback(interaction):
+        async def callback(interaction: discord.Interaction):
             nonlocal currentroom, room
             if interaction.user != ctx.author:
                 await interaction.response.send_message("Start your own dungeon", ephemeral=True)
@@ -304,7 +304,7 @@ async def dungeon(ctx):
             embed.add_field(name="HP", value=f"{health}/10")
         if currentroom.type == "Boss":
             view = ui.View()
-            async def victory(interaction):
+            async def victory(interaction: discord.Interaction):
                 if interaction.user != ctx.author:
                     await interaction.response.send_message("Start your own dungeon", ephemeral=True)
                     await achievements.give_ach(ctx.guild, interaction.user, "Random", "nope", ctx.channel)
@@ -339,7 +339,7 @@ async def dungeon(ctx):
     await ctx.send(embed=embed, view=view)
 
 @bot.hybrid_command()
-async def http(ctx, code):
+async def http(ctx: commands.Context, code: str):
     """HTTP status codes"""
     if not code.isdigit():
         await ctx.send("thats not a number")
@@ -352,7 +352,7 @@ async def http(ctx, code):
 
 @commands.is_owner()
 @bot.hybrid_command()
-async def reload(ctx, ext):
+async def reload(ctx: commands.Context, ext: str):
     await bot.reload_extension(ext)
     await bot.tree.sync()
     await ctx.send("Reloaded!")
@@ -364,7 +364,7 @@ asyncio.run(bot.load_extension("database"))
 bot.get_cog("Database").load()
 bot.get_cog("Achievements").load()
 
-async def on_command_error(ctx, error):
+async def on_command_error(ctx: commands.Context, error: Exception):
     print(error)
     if isinstance(error, commands.BadArgument):
         await ctx.send(error.args[0])
@@ -379,7 +379,7 @@ async def on_command_error(ctx, error):
     else:
         await ctx.send(embed=discord.Embed(title="An error occured!", description=error, color=discord.Color.red()))
 @bot.tree.error
-async def on_app_command_error(interaction, error):
+async def on_app_command_error(interaction: discord.Interaction, error: Exception):
     print(error)
     if isinstance(error, app_commands.TransformerError):
         await interaction.response.send_message("goofy ahh arguments")

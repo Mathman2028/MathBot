@@ -5,12 +5,12 @@ import json
 
 class Achievements(commands.Cog):
     """Everything relating to giving, getting, viewing, and checking achievements."""
-    async def guild_only(self, ctx):
+    async def guild_only(self, ctx: commands.Context):
         if ctx.guild is None:
             raise commands.NoPrivateMessage("No DMs!")
         return True
     
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.load()
 
@@ -18,14 +18,14 @@ class Achievements(commands.Cog):
         with open("achs.json", "r") as f:
             self.achievements = json.load(f)
 
-    def register(self, guild, member):
+    def register(self, guild: discord.Guild, member: discord.Member):
         Database = self.bot.get_cog("Database")
         user_db = Database.get_member(guild, member)
         if "achs" not in user_db.keys():
             user_db["achs"] = {}
         Database.save()
 
-    def has_ach(self, guild, member, ach):
+    def has_ach(self, guild: discord.Guild, member: discord.Member, ach: str):
         self.register(guild, member)
         Database = self.bot.get_cog("Database")
         user_db = Database.get_member(guild, member)["achs"]
@@ -33,7 +33,7 @@ class Achievements(commands.Cog):
             return False
         return user_db[ach]
 
-    async def give_ach(self, guild, member, category, ach, messageable):
+    async def give_ach(self, guild: discord.Guild, member: discord.Member, category: str, ach: str, messageable: discord.abc.Messageable):
         self.register(guild, member)
         Database = self.bot.get_cog("Database")
         new_ach = not self.has_ach(guild, member, ach)
@@ -45,11 +45,10 @@ class Achievements(commands.Cog):
             embed.set_footer(text=f"Achieved by {member.name}")
             await messageable.send(embed=embed)
     @commands.hybrid_command()
-    async def achs(self, ctx):
+    async def achs(self, ctx: commands.Context):
         """See your achievements"""
         Database = self.bot.get_cog("Database")
         self.register(ctx.guild, ctx.author)
-        user_db = Database.get_member(ctx.guild, ctx.author)["achs"]
         category = "Symbols"
         async def gen_embed():
             nonlocal category
@@ -58,9 +57,9 @@ class Achievements(commands.Cog):
                 emoji = "✅" if self.has_ach(ctx.guild, ctx.author, k) else "⬜"
                 embed.add_field(name=emoji + " " + v["name"], value=v["desc"] if category != "Random" or self.has_ach(ctx.guild, ctx.author, k) else "???")
             view = ui.View()
-            async def gen_callback(new_category):
+            async def gen_callback(new_category: str):
                 nonlocal category
-                async def callback(interaction):
+                async def callback(interaction: discord.Interaction):
                     nonlocal category
                     nonlocal new_category
                     if interaction.user != ctx.author:
@@ -82,5 +81,5 @@ class Achievements(commands.Cog):
         await ctx.send(embed=embed, view=view)
 Achievements.cog_check = Achievements.guild_only
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(Achievements(bot))
