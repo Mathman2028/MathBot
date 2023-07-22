@@ -415,12 +415,24 @@ class Symbols(commands.Cog):
                         person2offer[self.symbol.value.title()] = int(self.amount.value)
                 await interaction.response.defer()
                 await update_trade_embed(interaction)
+
+    @commands.hybrid_command()
+    async def create(self, ctx: commands.Context, symbol: Symbol, count: int = 1):
+        """Generate symbols out of thin air. Only useable by Mathman, don't even try."""
+        database = self.bot.get_cog("Database")
+        if not await self.bot.is_owner(ctx.author):
+            await ctx.send("You aren't Mathman so you get an hour cooldown lmao")
+            database.reset_cooldown(ctx.guild, ctx.author, 3600)
+            return
+        database.add_symbol(ctx.guild, ctx.author, symbol, count)
+        await ctx.send("ok")
     
     @craft.autocomplete("sym1")
     @craft.autocomplete("sym2")
     @recipes.autocomplete("symbol")
     @donate.autocomplete("symbol")
     @recycle.autocomplete("symbol")
+    @create.autocomplete("symbol")
     async def symbol_autocomplete(self, interaction: discord.Interaction, current: str):
         database = self.bot.get_cog("Database")
         return [app_commands.Choice(name=symbol + " (x" + str(database.get_member(interaction.guild, interaction.user)[symbol]) + ")", value=symbol) for symbol in symbols if current.lower() in symbol.lower() and database.has_symbol(interaction.guild, interaction.user, symbol)]
