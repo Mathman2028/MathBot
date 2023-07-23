@@ -134,7 +134,7 @@ async def quote(ctx: commands.Context):
     database = bot.get_cog("Database")
     guild_db = database.db[str(ctx.guild.id)]
     if "quotes" not in guild_db.keys():
-        await ctx.send("There are no quotes! Right click or tap an hold on a message, then select Apps > Quote to make a quote.")
+        await ctx.send("There are no quotes! Right click or tap and hold on a message, then select Apps > Quote to make a quote.")
         return
     random_quote = random.choice(guild_db["quotes"])
     author = random_quote["author"]
