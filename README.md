@@ -1,4 +1,4 @@
-# MathBot [![Discord server](https://img.shields.io/discord/1119928044811976744?label=discord&logo=discord)](https://discord.gg/c3TxDj6DYa) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md) 
+# MathBot [![Discord server](https://img.shields.io/discord/1119928044811976744?label=discord&logo=discord)](https://discord.gg/c3TxDj6DYa) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
 
 A fun discord bot made by @mathman2028. [Discord Server](https://discord.gg/c3TxDj6DYa) [Bot Invite](https://discord.com/api/oauth2/authorize?client_id=1119928094418018354&permissions=3136&scope=bot)
 
