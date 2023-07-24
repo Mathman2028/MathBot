@@ -5,49 +5,50 @@ import math
 from discord import ui
 from discord import app_commands
 
-recipes = {("Increment", "Increment"): "Addition",
-("Increment", "Inverse"): "Decrement",
-("One", "Addition"): "Natural Numbers",
-("One", "Decrement"): "Zero",
-("Natural Numbers", "Zero"): "Whole Numbers",
-("Decrement", "Decrement"): "Subtraction",
-("Zero", "Subtraction"): "Negative Numbers",
-("Whole Numbers", "Negative Numbers"): "Integers",
-("Natural Numbers", "Subtraction"): "Integers",
-("Addition", "Inverse"): "Subtraction",
-("Addition", "Addition"): "Multiplication",
-("Multiplication", "Inverse"): "Division",
-("Integers", "Division"): "Rational Numbers",
-("Rational Numbers", "Inverse"): "Irrational Numbers",
-("Rational Numbers", "Irrational Numbers"): "Real Numbers",
-("Multiplication", "Multiplication"): "Exponent",
-("Exponent", "Inverse"): "Logarithm",
-("Division", "One"): "Reciprocal",
-("Reciprocal", "Exponent"): "Root",
-("Negative Numbers", "Root"): "Imaginary Numbers",
-("Imaginary Numbers", "Real Numbers"): "Complex Numbers",
-("Reciprocal", "Zero"): "Infinity",
-("Point", "Point"): "Line Segment",
-("Line Segment", "Infinity"): "Ray",
-("Ray", "Infinity"): "Line",
-("Ray", "Ray"): "Angle",
-("Line", "Infinity"): "Plane",
-("Angle", "Real Numbers"): "Radians",
-("Line Segment", "Real Numbers"): "Distance",
-("Line Segment", "Line Segment"): "Polygon",
-("Distance", "Real Numbers"): "Circle",
-("Polygon", "Addition"): "Perimeter",
-("Polygon", "Multiplication"): "Area",
-("Circle", "Division"): "Pi",
-("Polygon", "Polygon"): "Solid",
-("Solid", "Circle"): "Sphere",
-("Circle", "Line"): "Cone",
-("Cone", "Plane"): "Conic Section",
-("Plane", "Infinity"): "Space",
-("Set", "Addition"): "Union",
-("Set", "Multiplication"): "Intersection",
-("Real Numbers", "Real Numbers"): "Ordered Pair",
-("Set", "Ordered Pair"): "Function",
+recipes = {
+    ("Increment", "Increment"): "Addition",
+    ("Increment", "Inverse"): "Decrement",
+    ("One", "Addition"): "Natural Numbers",
+    ("One", "Decrement"): "Zero",
+    ("Natural Numbers", "Zero"): "Whole Numbers",
+    ("Decrement", "Decrement"): "Subtraction",
+    ("Zero", "Subtraction"): "Negative Numbers",
+    ("Whole Numbers", "Negative Numbers"): "Integers",
+    ("Natural Numbers", "Subtraction"): "Integers",
+    ("Addition", "Inverse"): "Subtraction",
+    ("Addition", "Addition"): "Multiplication",
+    ("Multiplication", "Inverse"): "Division",
+    ("Integers", "Division"): "Rational Numbers",
+    ("Rational Numbers", "Inverse"): "Irrational Numbers",
+    ("Rational Numbers", "Irrational Numbers"): "Real Numbers",
+    ("Multiplication", "Multiplication"): "Exponent",
+    ("Exponent", "Inverse"): "Logarithm",
+    ("Division", "One"): "Reciprocal",
+    ("Reciprocal", "Exponent"): "Root",
+    ("Negative Numbers", "Root"): "Imaginary Numbers",
+    ("Imaginary Numbers", "Real Numbers"): "Complex Numbers",
+    ("Reciprocal", "Zero"): "Infinity",
+    ("Point", "Point"): "Line Segment",
+    ("Line Segment", "Infinity"): "Ray",
+    ("Ray", "Infinity"): "Line",
+    ("Ray", "Ray"): "Angle",
+    ("Line", "Infinity"): "Plane",
+    ("Angle", "Real Numbers"): "Radians",
+    ("Line Segment", "Real Numbers"): "Distance",
+    ("Line Segment", "Line Segment"): "Polygon",
+    ("Distance", "Real Numbers"): "Circle",
+    ("Polygon", "Addition"): "Perimeter",
+    ("Polygon", "Multiplication"): "Area",
+    ("Circle", "Division"): "Pi",
+    ("Polygon", "Polygon"): "Solid",
+    ("Solid", "Circle"): "Sphere",
+    ("Circle", "Line"): "Cone",
+    ("Cone", "Plane"): "Conic Section",
+    ("Plane", "Infinity"): "Space",
+    ("Set", "Addition"): "Union",
+    ("Set", "Multiplication"): "Intersection",
+    ("Real Numbers", "Real Numbers"): "Ordered Pair",
+    ("Set", "Ordered Pair"): "Function",
 }
 
 base_symbols = ["One", "Increment", "Inverse"]
@@ -55,10 +56,10 @@ recycle_results = base_symbols + ["Point"]
 dungeon_results = base_symbols + ["Set"]
 
 bonus_unlocks = {
-"Complex Numbers": "Real Numbers",
-"Logarithm": "Multiplication",
-"Pi": "Point",
-"Space": "Infinity",
+    "Complex Numbers": "Real Numbers",
+    "Logarithm": "Multiplication",
+    "Pi": "Point",
+    "Space": "Infinity",
 }
 
 special_symbols = {"Point", "Set"}
@@ -66,13 +67,15 @@ special_symbols = {"Point", "Set"}
 symbols = list(set(base_symbols) | set(recipes.values()) | special_symbols)
 symbols.sort()
 
+
 class Symbols(commands.Cog):
     """All the commands relating to the bot's symbol system."""
+
     async def guild_only(self, ctx: commands.Context):
         if ctx.guild is None:
             raise commands.NoPrivateMessage("No DMs!")
         return True
-    
+
     class Symbol(commands.Converter):
         async def convert(self, ctx: commands.Context, argument: str):
             if not argument.title() in symbols:
@@ -83,7 +86,9 @@ class Symbols(commands.Cog):
                 if len(possible) == 1:
                     return possible[0]
                 else:
-                    raise commands.BadArgument(message=f"{argument} isn't a valid symbol!")
+                    raise commands.BadArgument(
+                        message=f"{argument} isn't a valid symbol!"
+                    )
             return argument.title()
 
     def __init__(self, bot: commands.Bot):
@@ -97,7 +102,11 @@ class Symbols(commands.Cog):
             member = ctx.author
         user = database.get_member(ctx.guild, member)
         discovered = len(set(symbols) & set(user.keys()))
-        embed = discord.Embed(color=discord.Color.brand_green(), title=f"{member.name}'s inventory", description=f"Symbols discovered: {discovered}/{len(symbols)}")
+        embed = discord.Embed(
+            color=discord.Color.brand_green(),
+            title=f"{member.name}'s inventory",
+            description=f"Symbols discovered: {discovered}/{len(symbols)}",
+        )
         for i in symbols:
             if database.has_symbol(ctx.guild, member, i):
                 embed.add_field(name=i, value=user[i])
@@ -114,7 +123,11 @@ class Symbols(commands.Cog):
                 pool.append(bonus_unlocks[i])
         if database.on_cooldown(ctx.guild, ctx.author):
             user = database.get_member(ctx.guild, ctx.author)
-            await ctx.send("You're on cooldown! Try again <t:" + str(math.ceil(user["cooldown"])) + ":R>.")
+            await ctx.send(
+                "You're on cooldown! Try again <t:"
+                + str(math.ceil(user["cooldown"]))
+                + ":R>."
+            )
         else:
             database.reset_cooldown(ctx.guild, ctx.author)
             output = ""
@@ -122,11 +135,21 @@ class Symbols(commands.Cog):
                 symbol = random.choice(pool)
                 output += symbol + "\n"
                 database.add_symbol(ctx.guild, ctx.author, symbol)
-            await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Here's what you got", description=output))
-            await achievements.give_ach(ctx.guild, ctx.author, "Symbols", "first", ctx.channel)
+            await ctx.send(
+                embed=discord.Embed(
+                    color=discord.Color.brand_green(),
+                    title="Here's what you got",
+                    description=output,
+                )
+            )
+            await achievements.give_ach(
+                ctx.guild, ctx.author, "Symbols", "first", ctx.channel
+            )
 
     @commands.hybrid_command()
-    async def craft(self, ctx: commands.Context, sym1: Symbol, sym2: Symbol, amt: int = 1):
+    async def craft(
+        self, ctx: commands.Context, sym1: Symbol, sym2: Symbol, amt: int = 1
+    ):
         """Craft symbols to get better symbols"""
         database = self.bot.get_cog("Database")
         achievements = self.bot.get_cog("Achievements")
@@ -162,10 +185,16 @@ class Symbols(commands.Cog):
         user[sym2] -= amt
         database.add_symbol(ctx.guild, ctx.author, result, amt)
         await ctx.send(f"You got {result} x{amt}!")
-        await achievements.give_ach(ctx.guild, ctx.author, "Symbols", "craft", ctx.channel)
+        await achievements.give_ach(
+            ctx.guild, ctx.author, "Symbols", "craft", ctx.channel
+        )
         if result in bonus_unlocks.keys():
-            await ctx.send(f"Congratulations! Because you have {result}, you can now get {bonus_unlocks[result]} from getsymbol!")
-            await achievements.give_ach(ctx.guild, ctx.author, "Symbols", "bonus_unlock", ctx.channel)
+            await ctx.send(
+                f"Congratulations! Because you have {result}, you can now get {bonus_unlocks[result]} from getsymbol!"
+            )
+            await achievements.give_ach(
+                ctx.guild, ctx.author, "Symbols", "bonus_unlock", ctx.channel
+            )
 
     @commands.hybrid_command()
     async def recipes(self, ctx: commands.Context, symbol: Symbol):
@@ -173,16 +202,24 @@ class Symbols(commands.Cog):
         database = self.bot.get_cog("Database")
         output = ""
         user_db = database.get_member(ctx.guild, ctx.author)
+
         async def process_symbol(symbol):
             if symbol in user_db.keys():
                 return symbol
             else:
                 return "???"
+
         for k, v in recipes.items():
             if symbol not in k and symbol != v:
                 continue
             output += f"{await process_symbol(k[0])} + {await process_symbol(k[1])} = {await process_symbol(v)}\n"
-        await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title=f"Recipes with {symbol}", description=output))
+        await ctx.send(
+            embed=discord.Embed(
+                color=discord.Color.brand_green(),
+                title=f"Recipes with {symbol}",
+                description=output,
+            )
+        )
 
     @commands.hybrid_command()
     async def hint(self, ctx: commands.Context):
@@ -191,13 +228,29 @@ class Symbols(commands.Cog):
         output = ""
         user_db = database.get_member(ctx.guild, ctx.author)
         for k, v in recipes.items():
-            if k[0] in user_db.keys() and k[1] in user_db.keys() and v not in user_db.keys():
+            if (
+                k[0] in user_db.keys()
+                and k[1] in user_db.keys()
+                and v not in user_db.keys()
+            ):
                 output += f"{k[0]} + {k[1]}\n"
         output = "Nothing." if not output else output
-        await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="New recipes", description=output))
+        await ctx.send(
+            embed=discord.Embed(
+                color=discord.Color.brand_green(),
+                title="New recipes",
+                description=output,
+            )
+        )
 
     @commands.hybrid_command()
-    async def donate(self, ctx: commands.Context, reciever: discord.Member, symbol: Symbol, amount: int = 1):
+    async def donate(
+        self,
+        ctx: commands.Context,
+        reciever: discord.Member,
+        symbol: Symbol,
+        amount: int = 1,
+    ):
         """Give away your symbols"""
         database = self.bot.get_cog("Database")
         achievements = self.bot.get_cog("Achivements")
@@ -209,16 +262,26 @@ class Symbols(commands.Cog):
             return
         if reciever == ctx.author:
             await ctx.send("That doesn't count")
-            await achievements.give_ach(ctx.guild, ctx.author, "Random", "nofriends", ctx.channel)
+            await achievements.give_ach(
+                ctx.guild, ctx.author, "Random", "nofriends", ctx.channel
+            )
             return
         user = database.get_member(ctx.guild, ctx.author)
         user[symbol] -= amount
         database.add_symbol(ctx.guild, reciever, symbol, amount)
-        await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Donation successful", description=f"Successfully transferred {symbol} x{amount} to {reciever.name}."))
-        await achievements.give_ach(ctx.guild, ctx.author, "Symbols", "donate", ctx.channel)
+        await ctx.send(
+            embed=discord.Embed(
+                color=discord.Color.brand_green(),
+                title="Donation successful",
+                description=f"Successfully transferred {symbol} x{amount} to {reciever.name}.",
+            )
+        )
+        await achievements.give_ach(
+            ctx.guild, ctx.author, "Symbols", "donate", ctx.channel
+        )
 
     @commands.hybrid_command()
-    async def recycle(self, ctx: commands.Context, symbol: Symbol, amount:int=2):
+    async def recycle(self, ctx: commands.Context, symbol: Symbol, amount: int = 2):
         """Recycle n symbols, get n-1 symbols"""
         database = self.bot.get_cog("Database")
         if amount < 2:
@@ -235,7 +298,13 @@ class Symbols(commands.Cog):
                 new_symbol = random.choice(recycle_results)
             output += new_symbol + "\n"
             database.add_symbol(ctx.guild, ctx.author, new_symbol)
-        await ctx.send(embed=discord.Embed(color=discord.Color.brand_green(), title="Recycle results", description=output))
+        await ctx.send(
+            embed=discord.Embed(
+                color=discord.Color.brand_green(),
+                title="Recycle results",
+                description=output,
+            )
+        )
 
     @commands.hybrid_command()
     async def trade(self, ctx: commands.Context, person2: discord.Member):
@@ -245,7 +314,9 @@ class Symbols(commands.Cog):
         # thanks to milenakos for the code
         person1 = ctx.author
         if person1 == person2:
-            await achievements.give_ach(ctx.guild, ctx.author, "Random", "nofriends", ctx.channel)
+            await achievements.give_ach(
+                ctx.guild, ctx.author, "Random", "nofriends", ctx.channel
+            )
 
         person1accept = False
         person2accept = False
@@ -256,17 +327,26 @@ class Symbols(commands.Cog):
         async def denytrade(interaction: discord.Interaction):
             nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
             if interaction.user != person1 and interaction.user != person2:
-                await interaction.response.send_message("no", ephemeral = True)
-                await achievements.give_ach(interaction.guild, interaction.user, "Random", "nope", ctx.channel)
+                await interaction.response.send_message("no", ephemeral=True)
+                await achievements.give_ach(
+                    interaction.guild, interaction.user, "Random", "nope", ctx.channel
+                )
                 return
             person1offer = {}
             person2offer = {}
-            await interaction.message.edit(content=f"Trade cancelled by <@{interaction.user.id}>", embed=None, view=None)
+            await interaction.message.edit(
+                content=f"Trade cancelled by <@{interaction.user.id}>",
+                embed=None,
+                view=None,
+            )
+
         async def accepttrade(interaction: discord.Interaction):
             nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
             if interaction.user != person1 and interaction.user != person2:
-                await interaction.response.send_message("no", ephemeral = True)
-                await achievements.give_ach(interaction.guild, interaction.user, "Random", "nope", ctx.channel)
+                await interaction.response.send_message("no", ephemeral=True)
+                await achievements.give_ach(
+                    interaction.guild, interaction.user, "Random", "nope", ctx.channel
+                )
                 return
             if interaction.user == person1:
                 person1accept = not person1accept
@@ -287,7 +367,11 @@ class Symbols(commands.Cog):
                         error = True
                         break
                 if error:
-                    await interaction.message.edit("Some symbols disappeared during the trade, so the trade couldn't occur.", view=None, embed=None)
+                    await interaction.message.edit(
+                        "Some symbols disappeared during the trade, so the trade couldn't occur.",
+                        view=None,
+                        embed=None,
+                    )
                     return
 
                 person1db = database.get_member(interaction.guild, person1)
@@ -300,12 +384,17 @@ class Symbols(commands.Cog):
                     person2db[k] -= v
                 database.save()
 
-                await interaction.message.edit(content="Trade finished!", view=None, embed=None)
+                await interaction.message.edit(
+                    content="Trade finished!", view=None, embed=None
+                )
+
         async def offertrade(interaction: discord.Interaction):
             nonlocal person1, person2, person1accept, person2accept, person1offer, person2offer
             if interaction.user != person1 and interaction.user != person2:
-                await interaction.response.send_message("no", ephemeral = True)
-                await achievements.give_ach(interaction.guild, interaction.user, "Random", "nope", ctx.channel)
+                await interaction.response.send_message("no", ephemeral=True)
+                await achievements.give_ach(
+                    interaction.guild, interaction.user, "Random", "nope", ctx.channel
+                )
                 return
             if interaction.user == person1:
                 currentuser = 1
@@ -334,21 +423,29 @@ class Symbols(commands.Cog):
             view.add_item(deny)
             view.add_item(offer)
 
-            trade_embed = discord.Embed(color=discord.Color.brand_green(), title=f"Trade between {person1.name} and {person2.name}", description="trade real???")
+            trade_embed = discord.Embed(
+                color=discord.Color.brand_green(),
+                title=f"Trade between {person1.name} and {person2.name}",
+                description="trade real???",
+            )
             icon = "⬜"
             if person1accept:
                 icon = "✅"
             valuestr = ""
             for k, v in person1offer.items():
                 valuestr += k + " x" + str(v)
-            trade_embed.add_field(name=f"{icon} {person1.name}", inline=True, value=valuestr)
+            trade_embed.add_field(
+                name=f"{icon} {person1.name}", inline=True, value=valuestr
+            )
             icon = "⬜"
             if person2accept:
                 icon = "✅"
             valuestr = ""
             for k, v in person2offer.items():
                 valuestr += k + " x" + str(v)
-            trade_embed.add_field(name=f"{icon} {person2.name}", inline=True, value=valuestr)
+            trade_embed.add_field(
+                name=f"{icon} {person2.name}", inline=True, value=valuestr
+            )
             return trade_embed, view
 
         embed, view = await gen_embed()
@@ -361,24 +458,23 @@ class Symbols(commands.Cog):
         class TradeModal(ui.Modal):
             def __init__(self, currentuser: int):
                 super().__init__(
-                    title = "Add symbols to the trade",
-                    timeout = 5 * 60 # 5 minutes
+                    title="Add symbols to the trade", timeout=5 * 60  # 5 minutes
                 )
                 self.currentuser = currentuser
 
                 self.symbol = ui.TextInput(
-                    min_length = 1,
-                    max_length = 50,
-                    label = "Symbol to offer",
-                    placeholder = "One"
+                    min_length=1,
+                    max_length=50,
+                    label="Symbol to offer",
+                    placeholder="One",
                 )
                 self.add_item(self.symbol)
 
                 self.amount = ui.TextInput(
-                    min_length = 1,
-                    max_length = 50,
-                    label = "Amount to offer",
-                    placeholder = "1"
+                    min_length=1,
+                    max_length=50,
+                    label="Amount to offer",
+                    placeholder="1",
                 )
                 self.add_item(self.amount)
 
@@ -401,16 +497,25 @@ class Symbols(commands.Cog):
                         current_set = person2offer[self.symbol.value.title()]
                     else:
                         current_set = 0
-                if not database.has_symbol(interaction.guild, interaction.user, self.symbol.value.title(), current_set + int(self.amount.value)):
+                if not database.has_symbol(
+                    interaction.guild,
+                    interaction.user,
+                    self.symbol.value.title(),
+                    current_set + int(self.amount.value),
+                ):
                     return
                 if self.currentuser == 1:
                     if self.symbol.value.title() in person1offer.keys():
-                        person1offer[self.symbol.value.title()] += int(self.amount.value)
+                        person1offer[self.symbol.value.title()] += int(
+                            self.amount.value
+                        )
                     else:
                         person1offer[self.symbol.value.title()] = int(self.amount.value)
                 else:
                     if self.symbol.value.title() in person2offer.keys():
-                        person2offer[self.symbol.value.title()] += int(self.amount.value)
+                        person2offer[self.symbol.value.title()] += int(
+                            self.amount.value
+                        )
                     else:
                         person2offer[self.symbol.value.title()] = int(self.amount.value)
                 await interaction.response.defer()
@@ -426,7 +531,7 @@ class Symbols(commands.Cog):
             return
         database.add_symbol(ctx.guild, ctx.author, symbol, count)
         await ctx.send("ok")
-    
+
     @craft.autocomplete("sym1")
     @craft.autocomplete("sym2")
     @recipes.autocomplete("symbol")
@@ -435,10 +540,22 @@ class Symbols(commands.Cog):
     @create.autocomplete("symbol")
     async def symbol_autocomplete(self, interaction: discord.Interaction, current: str):
         database = self.bot.get_cog("Database")
-        return [app_commands.Choice(name=symbol + " (x" + str(database.get_member(interaction.guild, interaction.user)[symbol]) + ")", value=symbol) for symbol in symbols if current.lower() in symbol.lower() and database.has_symbol(interaction.guild, interaction.user, symbol)]
+        return [
+            app_commands.Choice(
+                name=symbol
+                + " (x"
+                + str(database.get_member(interaction.guild, interaction.user)[symbol])
+                + ")",
+                value=symbol,
+            )
+            for symbol in symbols
+            if current.lower() in symbol.lower()
+            and database.has_symbol(interaction.guild, interaction.user, symbol)
+        ]
+
 
 Symbols.cog_check = Symbols.guild_only
 
+
 async def setup(bot: commands.Bot):
     await bot.add_cog(Symbols(bot))
-    
