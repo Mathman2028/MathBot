@@ -124,9 +124,7 @@ class Symbols(commands.Cog):
         if database.on_cooldown(ctx.guild, ctx.author):
             user = database.get_member(ctx.guild, ctx.author)
             await ctx.send(
-                "You're on cooldown! Try again <t:"
-                + str(math.ceil(user["cooldown"]))
-                + ":R>."
+                f"You're on cooldown! Try again <t:{str(math.ceil(user['cooldown']))}:R>."
             )
         else:
             database.reset_cooldown(ctx.guild, ctx.author)

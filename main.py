@@ -152,12 +152,9 @@ async def msg_quote(interaction: discord.Interaction, message: discord.Message):
     guild_db = database.db[str(interaction.guild.id)]
     if "quotes" not in guild_db.keys():
         guild_db["quotes"] = []
-    if {"author": message.author.name, "content": message.content} not in guild_db[
-        "quotes"
-    ]:
-        guild_db["quotes"].append(
-            {"author": message.author.name, "content": message.content}
-        )
+    quotes = guild_db["quotes"]
+    if {"author": message.author.name, "content": message.content} not in quotes:
+        quotes.append({"author": message.author.name, "content": message.content})
     await interaction.response.send_message(
         embed=discord.Embed(
             color=discord.Color.brand_green(),
