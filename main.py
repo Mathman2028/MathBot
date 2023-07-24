@@ -209,9 +209,7 @@ async def playchess(ctx: commands.Context, opponent: discord.Member):
 
     board = chess.Board()
     white = ctx.author
-    black = (
-        opponent  # Might change this to either be random or make the challenger black
-    )
+    black = opponent
     game_over = False
 
     async def process_board(board: chess.Board) -> str:
