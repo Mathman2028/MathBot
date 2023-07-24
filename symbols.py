@@ -52,8 +52,8 @@ RECIPES = {
 }
 
 BASE_SYMBOLS = ("One", "Increment", "Inverse")
-RECYCLE_RESULTS = BASE_SYMBOLS + ("Point")
-DUNGEON_RESULTS = BASE_SYMBOLS + ("Set")
+RECYCLE_RESULTS = BASE_SYMBOLS + ("Point",)
+DUNGEON_RESULTS = BASE_SYMBOLS + ("Set",)
 
 BONUS_UNLOCKS = {
     "Complex Numbers": "Real Numbers",
