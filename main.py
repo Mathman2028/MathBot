@@ -7,7 +7,7 @@ import asyncio
 import typing
 import re
 import chess
-from symbols import dungeon_results
+from symbols import DUNGEON_RESULTS
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -418,7 +418,7 @@ async def dungeon(ctx: commands.Context):
                 reward_text = ""
                 num_symbols = (health + 2) // 3
                 for _ in range(num_symbols):
-                    symbol = random.choice(dungeon_results)
+                    symbol = random.choice(DUNGEON_RESULTS)
                     database.add_symbol(ctx.guild, ctx.author, symbol)
                     reward_text += symbol + "\n"
                 embed.add_field(name="Results", value=reward_text)

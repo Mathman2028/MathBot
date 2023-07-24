@@ -5,7 +5,7 @@ import math
 from discord import ui
 from discord import app_commands
 
-recipes = {
+RECIPES = {
     ("Increment", "Increment"): "Addition",
     ("Increment", "Inverse"): "Decrement",
     ("One", "Addition"): "Natural Numbers",
@@ -51,21 +51,20 @@ recipes = {
     ("Set", "Ordered Pair"): "Function",
 }
 
-base_symbols = ["One", "Increment", "Inverse"]
-recycle_results = base_symbols + ["Point"]
-dungeon_results = base_symbols + ["Set"]
+BASE_SYMBOLS = ("One", "Increment", "Inverse")
+RECYCLE_RESULTS = BASE_SYMBOLS + ("Point")
+DUNGEON_RESULTS = BASE_SYMBOLS + ("Set")
 
-bonus_unlocks = {
+BONUS_UNLOCKS = {
     "Complex Numbers": "Real Numbers",
     "Logarithm": "Multiplication",
     "Pi": "Point",
     "Space": "Infinity",
 }
 
-special_symbols = {"Point", "Set"}
+SPECIAL_SYMBOLS = {"Point", "Set"}
 
-symbols = list(set(base_symbols) | set(recipes.values()) | special_symbols)
-symbols.sort()
+SYMBOLS = sorted(list(set(BASE_SYMBOLS) | set(RECIPES.values()) | SPECIAL_SYMBOLS))
 
 
 class Symbols(commands.Cog):
@@ -78,9 +77,9 @@ class Symbols(commands.Cog):
 
     class Symbol(commands.Converter):
         async def convert(self, ctx: commands.Context, argument: str):
-            if not argument.title() in symbols:
+            if not argument.title() in SYMBOLS:
                 possible = []
-                for i in symbols:
+                for i in SYMBOLS:
                     if i.startswith(argument.title()):
                         possible.append(i)
                 if len(possible) == 1:
@@ -101,13 +100,13 @@ class Symbols(commands.Cog):
         if member is None:
             member = ctx.author
         user = database.get_member(ctx.guild, member)
-        discovered = len(set(symbols) & set(user.keys()))
+        discovered = len(set(SYMBOLS) & set(user.keys()))
         embed = discord.Embed(
             color=discord.Color.brand_green(),
             title=f"{member.name}'s inventory",
-            description=f"Symbols discovered: {discovered}/{len(symbols)}",
+            description=f"Symbols discovered: {discovered}/{len(SYMBOLS)}",
         )
-        for i in symbols:
+        for i in SYMBOLS:
             if database.has_symbol(ctx.guild, member, i):
                 embed.add_field(name=i, value=user[i])
         await ctx.send(embed=embed)
@@ -117,10 +116,10 @@ class Symbols(commands.Cog):
         """Get some base symbols every 10 minutes"""
         database = self.bot.get_cog("Database")
         achievements = self.bot.get_cog("Achievements")
-        pool = base_symbols * 3
-        for i in bonus_unlocks.keys():
+        pool = BASE_SYMBOLS * 3
+        for i in BONUS_UNLOCKS.keys():
             if database.has_symbol(ctx.guild, ctx.author, i):
-                pool.append(bonus_unlocks[i])
+                pool.append(BONUS_UNLOCKS[i])
         if database.on_cooldown(ctx.guild, ctx.author):
             user = database.get_member(ctx.guild, ctx.author)
             await ctx.send(
@@ -154,10 +153,10 @@ class Symbols(commands.Cog):
         if amt < 1:
             await ctx.send("Nope")
             return
-        if sym1 not in symbols:
+        if sym1 not in SYMBOLS:
             await ctx.send(f"{sym1} isn't a symbol!")
             return
-        if sym2 not in symbols:
+        if sym2 not in SYMBOLS:
             await ctx.send(f"{sym2} isn't a symbol!")
             return
         if sym1 == sym2:
@@ -171,10 +170,10 @@ class Symbols(commands.Cog):
             if not database.has_symbol(ctx.guild, ctx.author, sym2, amt):
                 await ctx.send(f"You don't have enough of {sym2}.")
                 return
-        if (sym1, sym2) in recipes:
-            result = recipes[(sym1, sym2)]
-        elif (sym2, sym1) in recipes:
-            result = recipes[(sym2, sym1)]
+        if (sym1, sym2) in RECIPES:
+            result = RECIPES[(sym1, sym2)]
+        elif (sym2, sym1) in RECIPES:
+            result = RECIPES[(sym2, sym1)]
         else:
             await ctx.send("I couldn't find that recipe.")
             return
@@ -186,9 +185,9 @@ class Symbols(commands.Cog):
         await achievements.give_ach(
             ctx.guild, ctx.author, "Symbols", "craft", ctx.channel
         )
-        if result in bonus_unlocks.keys():
+        if result in BONUS_UNLOCKS.keys():
             await ctx.send(
-                f"Congratulations! Because you have {result}, you can now get {bonus_unlocks[result]} from getsymbol!"
+                f"Congratulations! Because you have {result}, you can now get {BONUS_UNLOCKS[result]} from getsymbol!"
             )
             await achievements.give_ach(
                 ctx.guild, ctx.author, "Symbols", "bonus_unlock", ctx.channel
@@ -207,7 +206,7 @@ class Symbols(commands.Cog):
             else:
                 return "???"
 
-        for k, v in recipes.items():
+        for k, v in RECIPES.items():
             if symbol not in k and symbol != v:
                 continue
             output += f"{await process_symbol(k[0])} + {await process_symbol(k[1])} = {await process_symbol(v)}\n"
@@ -225,7 +224,7 @@ class Symbols(commands.Cog):
         database = self.bot.get_cog("Database")
         output = ""
         user_db = database.get_member(ctx.guild, ctx.author)
-        for k, v in recipes.items():
+        for k, v in RECIPES.items():
             if (
                 k[0] in user_db.keys()
                 and k[1] in user_db.keys()
@@ -291,9 +290,9 @@ class Symbols(commands.Cog):
         user[symbol] -= amount
         output = ""
         for _ in range(amount - 1):
-            new_symbol = random.choice(recycle_results)
+            new_symbol = random.choice(RECYCLE_RESULTS)
             while new_symbol == symbol:
-                new_symbol = random.choice(recycle_results)
+                new_symbol = random.choice(RECYCLE_RESULTS)
             output += new_symbol + "\n"
             database.add_symbol(ctx.guild, ctx.author, new_symbol)
         await ctx.send(
@@ -483,7 +482,7 @@ class Symbols(commands.Cog):
                         raise Exception
                 except Exception:
                     return
-                if not self.symbol.value.title() in symbols:
+                if not self.symbol.value.title() in SYMBOLS:
                     return
                 if self.currentuser == 1:
                     if self.symbol.value.title() in person1offer.keys():
@@ -546,7 +545,7 @@ class Symbols(commands.Cog):
                 + ")",
                 value=symbol,
             )
-            for symbol in symbols
+            for symbol in SYMBOLS
             if current.lower() in symbol.lower()
             and database.has_symbol(interaction.guild, interaction.user, symbol)
         ]
