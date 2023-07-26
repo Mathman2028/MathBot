@@ -67,7 +67,7 @@ SPECIAL_SYMBOLS = {"Point", "Set"}
 SYMBOLS = sorted(list(set(BASE_SYMBOLS) | set(RECIPES.values()) | SPECIAL_SYMBOLS))
 
 
-class Symbols(commands.Cog):
+class Symbols(commands.GroupCog, group_name="symbol"):
     """All the commands relating to the bot's symbol system."""
 
     async def guild_only(self, ctx: commands.Context):
@@ -119,7 +119,7 @@ class Symbols(commands.Cog):
         pool = BASE_SYMBOLS * 3
         for i in BONUS_UNLOCKS.keys():
             if database.has_symbol(ctx.guild, ctx.author, i):
-                pool.append(BONUS_UNLOCKS[i])
+                pool += (BONUS_UNLOCKS[i],)
         if database.on_cooldown(ctx.guild, ctx.author):
             user = database.get_member(ctx.guild, ctx.author)
             await ctx.send(
