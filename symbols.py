@@ -112,7 +112,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
         await ctx.send(embed=embed)
 
     @commands.hybrid_command()
-    async def getsymbol(self, ctx: commands.Context):
+    async def get(self, ctx: commands.Context):
         """Get some base symbols every 10 minutes"""
         database = self.bot.get_cog("Database")
         achievements = self.bot.get_cog("Achievements")
@@ -187,7 +187,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
         )
         if result in BONUS_UNLOCKS.keys():
             await ctx.send(
-                f"Congratulations! Because you have {result}, you can now get {BONUS_UNLOCKS[result]} from getsymbol!"
+                f"Congratulations! Because you have {result}, you can now get {BONUS_UNLOCKS[result]} from </symbol get:1133587417534836818>!"
             )
             await achievements.give_ach(
                 ctx.guild, ctx.author, "Symbols", "bonus_unlock", ctx.channel
