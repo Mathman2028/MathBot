@@ -6,7 +6,7 @@ A fun discord bot made by @mathman2028. [Discord Server](https://discord.gg/c3Tx
 
 1. Clone the repository
 2. Install discord.py
-3. Create a system environment variable called "token" to store your token, put your bot's token in it
+3. Create a system environment variable called "mathbot_token" to store your token, put your bot's token in it
 4. Create a db.json file, just put `{}` there
 5. Run the bot
 

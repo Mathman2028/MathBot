@@ -20,7 +20,7 @@ bot = commands.Bot(
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=False),
 )
 
-TOKEN = os.environ["token"]
+TOKEN = os.environ["mathbot_token"]
 
 
 @bot.event
