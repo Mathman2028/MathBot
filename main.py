@@ -423,7 +423,7 @@ async def dungeon(ctx: commands.Context):
                     title="The Dungeon", description="You have won! Good job."
                 )
                 reward_text = ""
-                num_symbols = (health + 2) // 3
+                num_symbols = ((health + 2) // 3) * 2
                 for _ in range(num_symbols):
                     symbol = random.choice(DUNGEON_RESULTS)
                     database.add_symbol(ctx.guild, ctx.author, symbol)
