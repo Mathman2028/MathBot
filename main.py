@@ -38,22 +38,26 @@ async def echo(ctx: commands.Context, *, text: str):
 @bot.hybrid_command()
 async def calculate(
     ctx: commands.Context,
-    *,
-    expression: str,
+    num1: float,
+    op: typing.Literal["+", "-", "*", "/", "^"],
+    num2: float,
 ):
     """Does simple calculations"""
-    if re.match(
-        "^-?(\(-?)*(((\(-?)*[0-9]+(\.[0-9]+)?)\)*(\+|\-|\*|\/|\*\*[-]?))*(\(-?)*([0-9]+(\.[0-9]+)?)\)*$",
-        expression,
-    ):
-        try:
-            await ctx.send(eval(expression))
-        except ZeroDivisionError:
-            await ctx.send("dont divide by zero lmao")
-        except SyntaxError:
-            await ctx.send("somethings not right there")
+    if op in ("+", "plus", "add"):
+        await ctx.send(num1 + num2)
+    elif op in ("-", "minus", "subtract"):
+        await ctx.send(num1 - num2)
+    elif op in ("*", "x", "\u00d7", "times", "multiply"):
+        await ctx.send(num1 * num2)
+    elif op in ("/", "÷", "over", "divide"):
+        if num2 == 0:
+            await ctx.send("dont divide by 0 idiot")
+            return
+        await ctx.send(num1 / num2)
+    elif op in ("^", "**", "exponent"):
+        await ctx.send(num1 / num2)
     else:
-        await ctx.send("thats not right lmao")
+        await ctx.send("Invalid operation!")
 
 
 @bot.hybrid_command()
