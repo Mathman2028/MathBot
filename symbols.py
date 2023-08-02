@@ -97,10 +97,13 @@ class Symbols(commands.GroupCog, group_name="symbol"):
     async def inv(self, ctx: commands.Context, member: discord.Member | None):
         """Displays your inventory"""
         database = self.bot.get_cog("Database")
+        achievements = self.bot.get_cog("Achievements")
         if member is None:
             member = ctx.author
         user = database.get_member(ctx.guild, member)
         discovered = len(set(SYMBOLS) & set(user.keys()))
+        if discovered == len(SYMBOLS):
+            await achievements.give_ach(ctx.guild, ctx.member, "Symbols", "everything", ctx.channel)
         embed = discord.Embed(
             color=discord.Color.brand_green(),
             title=f"{member.name}'s inventory",

@@ -15,6 +15,10 @@
     "donate": {
       "name": "Generous",
       "desc": "Donate a symbol to someone"
+    },
+    "everything": {
+      "name": "Mathematician",
+      "desc": "Discover every symbol"
     }
   },
   "Random": {
