@@ -43,7 +43,7 @@ async def calculate(
 ):
     """Does simple calculations"""
     if re.match(
-        "/^-?(\(-?)*(((\(-?)*[0-9]+(\.[0-9]+)?)\)*(\+|\-|\*|\/|\*\*[-]?))*(\(-?)*([0-9]+(\.[0-9]+)?)\)*$/",
+        "^-?(\(-?)*(((\(-?)*[0-9]+(\.[0-9]+)?)\)*(\+|\-|\*|\/|\*\*[-]?))*(\(-?)*([0-9]+(\.[0-9]+)?)\)*$",
         expression,
     ):
         try:
@@ -52,6 +52,8 @@ async def calculate(
             await ctx.send("dont divide by zero lmao")
         except SyntaxError:
             await ctx.send("somethings not right there")
+    else:
+        await ctx.send("thats not right lmao")
 
 
 @bot.hybrid_command()
