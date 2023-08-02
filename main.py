@@ -8,6 +8,7 @@ import typing
 import re
 import chess
 from symbols import DUNGEON_RESULTS
+import datetime
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -159,9 +160,11 @@ async def msg_quote(interaction: discord.Interaction, message: discord.Message):
     guild_db = database.db[str(interaction.guild.id)]
     if "quotes" not in guild_db.keys():
         guild_db["quotes"] = []
-    quotes = guild_db["quotes"]
-    if {"author": message.author.name, "content": message.content} not in quotes:
-        quotes.append({"author": message.author.name, "content": message.content})
+    quotes: list = guild_db["quotes"]
+    if {"author": message.author.name, "content": message.content, "time": int(message.created_at.timestamp())} not in quotes:
+        if {"author": message.author.name, "content": message.content} in quotes:
+            quotes.remove({"author": message.author.name, "content": message.content})
+        quotes.append({"author": message.author.name, "content": message.content, "time": int(message.created_at.timestamp())})
     await interaction.response.send_message(
         embed=discord.Embed(
             color=discord.Color.brand_green(),
@@ -169,10 +172,11 @@ async def msg_quote(interaction: discord.Interaction, message: discord.Message):
             description=message.content,
         )
     )
+    await database.save()
 
 
 @bot.hybrid_command()
-async def quote(ctx: commands.Context):
+async def quote(ctx: commands.Context, choose: typing.Literal["random", "list"]):
     """Displays a random quote from your server selected by the Quote context menu command"""
     database = bot.get_cog("Database")
     guild_db = database.db[str(ctx.guild.id)]
@@ -181,15 +185,29 @@ async def quote(ctx: commands.Context):
             "There are no quotes! Right click or tap and hold on a message, then select Apps > Quote to make a quote."
         )
         return
-    random_quote = random.choice(guild_db["quotes"])
-    author = random_quote["author"]
-    await ctx.send(
-        embed=discord.Embed(
+    if choose == "list":
+        embed = discord.Embed(
+            color=discord.Color.brand_green(),
+            title=f"{ctx.guild.name}'s quotes",
+        )
+        for i in guild_db["quotes"]:
+            author = i["author"]
+            embed.add_field(
+                name=author,
+                value=i["content"] + "\n" + (f"<t:{i['time']}:f>" if "time" in i.keys() else "")
+            )
+        await ctx.send(embed=embed)
+    else:
+        random_quote = random.choice(guild_db["quotes"])
+        author = random_quote["author"]
+        embed = discord.Embed(
             color=discord.Color.brand_green(),
             title=f"Quote from {author}",
             description=random_quote["content"],
         )
-    )
+        if "time" in random_quote.keys():
+            embed.set_footer(text=f"{str(datetime.datetime.fromtimestamp(random_quote['time']))}")
+        await ctx.send(embed=embed)
 
 
 @bot.hybrid_command()
