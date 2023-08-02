@@ -115,6 +115,13 @@ async def easter_eggs(message: discord.Message):
         await message.reply("i asked")
     if "google en passant" in message.content.lower():
         await message.reply("holy hell")
+        await achievements.give_ach(
+            message.guild,
+            message.author,
+            "Random",
+            "enpassant",
+            message.channel,
+        )
     if "xnopyt" in message.content.lower():
         await message.reply(
             'If you accept the definition of a word as some letters surrounded by a gap, then "xnopyt", "aaaaaaajjjjjjjjj", and "hrrkrkrkrwpfrbbrbrbrlablblblblblblwhitoo\'ap" are all words, despite being pretty much meaningless.'
