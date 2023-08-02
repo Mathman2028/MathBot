@@ -250,7 +250,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
     ):
         """Give away your symbols"""
         database = self.bot.get_cog("Database")
-        achievements = self.bot.get_cog("Achivements")
+        achievements = self.bot.get_cog("Achievements")
         if amount < 1:
             await ctx.send("You can't do that")
             return
