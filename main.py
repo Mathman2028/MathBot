@@ -60,6 +60,33 @@ async def calculate(
     else:
         await ctx.send("Invalid operation!")
 
+@bot.hybrid_command()
+async def complexcalculate(
+    ctx: commands.Context,
+    num1real: float,
+    num1imag: float,
+    op: typing.Literal["+", "-", "*", "/", "^"],
+    num2real: float,
+    num2imag: float
+):
+    """Does simple calculations...but complex."""
+    num1 = num1real + num1imag * 1j
+    num2 = num2real + num2imag * 1j
+    if op == "+":
+        await ctx.send(num1 + num2)
+    elif op == "-":
+        await ctx.send(num1 - num2)
+    elif op == "\u00d7":
+        await ctx.send(num1 * num2)
+    elif op == "÷":
+        if num2 == 0:
+            await ctx.send("dont divide by 0 idiot")
+            return
+        await ctx.send(num1 / num2)
+    elif op == "^":
+        await ctx.send(num1 ** num2)
+    else:
+        await ctx.send("Invalid operation!")
 
 @bot.hybrid_command()
 async def stupidcalculator(
