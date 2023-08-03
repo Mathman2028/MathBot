@@ -40,22 +40,22 @@ async def echo(ctx: commands.Context, *, text: str):
 async def calculate(
     ctx: commands.Context,
     num1: float,
-    op: typing.Literal["+", "-", "*", "/", "^"],
+    op: typing.Literal["+", "-", "\u00d7", "÷", "^"],
     num2: float,
 ):
     """Does simple calculations"""
-    if op in ("+", "plus", "add"):
+    if op == "+":
         await ctx.send(num1 + num2)
-    elif op in ("-", "minus", "subtract"):
+    elif op == "-":
         await ctx.send(num1 - num2)
-    elif op in ("*", "x", "\u00d7", "times", "multiply"):
+    elif op == "\u00d7":
         await ctx.send(num1 * num2)
-    elif op in ("/", "÷", "over", "divide"):
+    elif op == "÷":
         if num2 == 0:
             await ctx.send("dont divide by 0 idiot")
             return
         await ctx.send(num1 / num2)
-    elif op in ("^", "**", "exponent"):
+    elif op == "^":
         await ctx.send(num1 ** num2)
     else:
         await ctx.send("Invalid operation!")
