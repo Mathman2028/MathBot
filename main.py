@@ -56,7 +56,7 @@ async def calculate(
             return
         await ctx.send(num1 / num2)
     elif op in ("^", "**", "exponent"):
-        await ctx.send(num1 / num2)
+        await ctx.send(num1 ** num2)
     else:
         await ctx.send("Invalid operation!")
 
