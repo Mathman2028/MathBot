@@ -103,7 +103,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
         user = database.get_member(ctx.guild, member)
         discovered = len(set(SYMBOLS) & set(user.keys()))
         if discovered == len(SYMBOLS):
-            await achievements.give_ach(ctx.guild, ctx.author, "Symbols", "everything", ctx.channel)
+            await achievements.give_ach(ctx.guild, member, "Symbols", "everything", ctx.channel)
         embed = discord.Embed(
             color=discord.Color.brand_green(),
             title=f"{member.name}'s inventory",
