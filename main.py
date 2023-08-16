@@ -9,6 +9,9 @@ import re
 import chess
 from symbols import DUNGEON_RESULTS
 import datetime
+if typing.TYPE_CHECKING:
+    from database import Database
+
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -180,7 +183,7 @@ async def easter_eggs(message: discord.Message):
 @app_commands.guild_only()
 async def msg_quote(interaction: discord.Interaction, message: discord.Message):
     """Quote someone and have it be preserved in the quote command for the rest of time"""
-    database = bot.get_cog("Database")
+    database: "Database" = bot.get_cog("Database")
     if message.author == interaction.user:
         await interaction.response.send_message("You can't quote yourself")
         return
@@ -205,7 +208,7 @@ async def msg_quote(interaction: discord.Interaction, message: discord.Message):
 @bot.hybrid_command()
 async def quote(ctx: commands.Context, choose: typing.Literal["random", "list"]):
     """Displays a random quote from your server selected by the Quote context menu command"""
-    database = bot.get_cog("Database")
+    database: "Database" = bot.get_cog("Database")
     guild_db = database.db[str(ctx.guild.id)]
     if "quotes" not in guild_db.keys():
         await ctx.send(
@@ -355,7 +358,7 @@ async def playchess(ctx: commands.Context, opponent: discord.Member):
 @bot.hybrid_command()
 async def dungeon(ctx: commands.Context):
     """Enter a random dungeon"""
-    database = bot.get_cog("Database")
+    database: "Database" = bot.get_cog("Database")
     achievements = bot.get_cog("Achievements")
     roomtypes = ["Enemy"] * 10 + ["Empty"] * 5 + ["Heal"] * 4
     emojis = {"Enemy": "💀", "Empty": "⬛", "Boss": "☠️", "Heal": "❤️"}

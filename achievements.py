@@ -2,7 +2,9 @@ import discord
 from discord.ext import commands
 from discord import ui
 import json
-
+import typing
+if typing.TYPE_CHECKING:
+    from database import Database
 
 class Achievements(commands.Cog):
     """Everything relating to giving, getting, viewing, and checking achievements."""
@@ -21,16 +23,16 @@ class Achievements(commands.Cog):
             self.achievements = json.load(f)
 
     def register(self, guild: discord.Guild, member: discord.Member):
-        Database = self.bot.get_cog("Database")
-        user_db = Database.get_member(guild, member)
+        database: "Database" = self.bot.get_cog("Database")
+        user_db = database.get_member(guild, member)
         if "achs" not in user_db.keys():
             user_db["achs"] = {}
-        Database.save()
+        database.save()
 
     def has_ach(self, guild: discord.Guild, member: discord.Member, ach: str):
         self.register(guild, member)
-        Database = self.bot.get_cog("Database")
-        user_db = Database.get_member(guild, member)["achs"]
+        database: "Database" = self.bot.get_cog("Database")
+        user_db = database.get_member(guild, member)["achs"]
         if ach not in user_db.keys():
             return False
         return user_db[ach]
@@ -44,10 +46,10 @@ class Achievements(commands.Cog):
         messageable: discord.abc.Messageable,
     ):
         self.register(guild, member)
-        Database = self.bot.get_cog("Database")
+        database: "Database" = self.bot.get_cog("Database")
         new_ach = not self.has_ach(guild, member, ach)
-        Database.get_member(guild, member)["achs"][ach] = True
-        Database.save()
+        database.get_member(guild, member)["achs"][ach] = True
+        database.save()
         ach_data = self.achievements[category][ach]
         if new_ach:
             embed = discord.Embed(
@@ -61,7 +63,7 @@ class Achievements(commands.Cog):
     @commands.hybrid_command()
     async def achs(self, ctx: commands.Context):
         """See your achievements"""
-        Database = self.bot.get_cog("Database")
+        database: "Database" = self.bot.get_cog("Database")
         self.register(ctx.guild, ctx.author)
         category = "Symbols"
 
