@@ -505,6 +505,11 @@ async def reload(ctx: commands.Context, ext: str):
     await bot.tree.sync()
     await ctx.send("Reloaded!")
 
+@commands.is_owner()
+@bot.hybrid_command()
+async def pull(ctx: commands.Context):
+    os.system('git pull')
+    await ctx.send("Pulled!")
 
 asyncio.run(bot.load_extension("symbols"))
 asyncio.run(bot.load_extension("achievements"))
