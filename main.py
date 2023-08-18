@@ -187,7 +187,7 @@ async def msg_quote(interaction: discord.Interaction, message: discord.Message):
     if message.author == interaction.user:
         await interaction.response.send_message("You can't quote yourself")
         return
-    guild_db = database.db[str(interaction.guild.id)]
+    guild_db = database.get_server(interaction.guild)
     if "quotes" not in guild_db.keys():
         guild_db["quotes"] = []
     quotes: list = guild_db["quotes"]
@@ -209,7 +209,7 @@ async def msg_quote(interaction: discord.Interaction, message: discord.Message):
 async def quote(ctx: commands.Context, choose: typing.Literal["random", "list"]):
     """Displays a random quote from your server selected by the Quote context menu command"""
     database: "Database" = bot.get_cog("Database")
-    guild_db = database.db[str(ctx.guild.id)]
+    guild_db = database.get_server(ctx.guild)
     if "quotes" not in guild_db.keys():
         await ctx.send(
             "There are no quotes! Right click or tap and hold on a message, then select Apps > Quote to make a quote."

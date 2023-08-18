@@ -30,6 +30,13 @@ class Database(commands.Cog):
         self.register_member(server, member)
         return self.db[str(server.id)][str(member.id)]
 
+    def get_server(self, server: discord.Guild):
+        db = self.db
+        if not str(server.id) in db.keys():
+            db[str(server.id)] = {}
+            self.save()
+        return db[str(server.id)]
+    
     def add_symbol(
         self, server: discord.Guild, member: discord.Member, symbol: str, count: int = 1
     ):
