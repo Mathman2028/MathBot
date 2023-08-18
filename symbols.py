@@ -146,16 +146,18 @@ class Symbols(commands.GroupCog, group_name="symbol"):
         else:
             database.reset_cooldown(ctx.guild, ctx.author)
             output = ""
+            value = 0
             for _ in range(random.randint(5, 7)):
                 symbol = random.choice(pool)
                 output += symbol + "\n"
                 database.add_symbol(ctx.guild, ctx.author, symbol)
+                value += VALUES[symbol]
             await ctx.send(
                 embed=discord.Embed(
                     color=discord.Color.brand_green(),
                     title="Here's what you got",
                     description=output,
-                )
+                ).set_footer(text=f"Total value: {value}")
             )
             await achievements.give_ach(
                 ctx.guild, ctx.author, "Symbols", "first", ctx.channel
@@ -306,6 +308,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
             await ctx.send("You don't have enough!")
         user = database.get_member(ctx.guild, ctx.author)
         user[symbol] -= amount
+        value = VALUES[symbol] * amount * -1
         output = ""
         for _ in range(amount - 1):
             new_symbol = random.choice(RECYCLE_RESULTS)
@@ -313,12 +316,13 @@ class Symbols(commands.GroupCog, group_name="symbol"):
                 new_symbol = random.choice(RECYCLE_RESULTS)
             output += new_symbol + "\n"
             database.add_symbol(ctx.guild, ctx.author, new_symbol)
+            value += VALUES[new_symbol]
         await ctx.send(
             embed=discord.Embed(
                 color=discord.Color.brand_green(),
                 title="Recycle results",
                 description=output,
-            )
+            ).set_footer(text=f"Value {'gained' if value > 0 else 'lost'}: {value}")
         )
 
     @commands.hybrid_command()
