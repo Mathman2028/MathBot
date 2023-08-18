@@ -70,14 +70,9 @@ SPECIAL_SYMBOLS = {"Point", "Set"}
 
 SYMBOLS = sorted(list(set(BASE_SYMBOLS) | set(RECIPES.values()) | SPECIAL_SYMBOLS))
 
-VALUES = {i: 1 for i in BASE_SYMBOLS}
-VALUES.update({i: 3 for i in SPECIAL_SYMBOLS})
-VALUES.update(
-    {
-        v: min(VALUES.get(v, 1_000_000), (VALUES[k1] + VALUES[k2] + 1))
-        for (k1, k2), v in RECIPES.items()
-    }
-)
+VALUES = {i: 1 for i in BASE_SYMBOLS} | {i: 3 for i in SPECIAL_SYMBOLS}
+for (k1, k2), v in RECIPES.items():
+    VALUES[v] = min(VALUES.get(v, 1_000_000), VALUES[k1] + VALUES[k2] + 1)
 # The value of a symbol is 1 for base symbols, 3 for special symbols, and the value of its two parts plus one otherwise.
 # If multiple recipes exist, the lowest value is chosen.
 
