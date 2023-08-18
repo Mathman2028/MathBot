@@ -322,7 +322,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
                 color=discord.Color.brand_green(),
                 title="Recycle results",
                 description=output,
-            ).set_footer(text=f"Value {'gained' if value > 0 else 'lost'}: {value}")
+            ).set_footer(text=f"Value {'gained' if value > 0 else 'lost'}: {abs(value)}")
         )
 
     @commands.hybrid_command()
