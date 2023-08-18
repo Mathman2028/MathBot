@@ -126,7 +126,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
             if database.has_symbol(ctx.guild, member, i):
                 embed.add_field(name=i, value=user[i])
                 value += VALUES[i] * user[i]
-        embed.set_footer(f"Total value: {value}")
+        embed.set_footer(text=f"Total value: {value}")
         await ctx.send(embed=embed)
 
     @commands.hybrid_command()
