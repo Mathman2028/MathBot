@@ -10,7 +10,7 @@ class Database(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    def load(self):
+    def _load(self):
         with open("db.json", "r") as f:
             self.db = json.load(f)
 
@@ -18,7 +18,7 @@ class Database(commands.Cog):
         with open("db.json", "w") as f:
             json.dump(self.db, f)
 
-    def register_member(self, server: discord.Guild, member: discord.Member):
+    def _register_member(self, server: discord.Guild, member: discord.Member):
         db = self.db
         if not str(server.id) in db.keys():
             db[str(server.id)] = {}
@@ -26,8 +26,8 @@ class Database(commands.Cog):
             db[str(server.id)][str(member.id)] = {}
             self.save()
 
-    def get_member(self, server: discord.Guild, member: discord.Member):
-        self.register_member(server, member)
+    def _get_member(self, server: discord.Guild, member: discord.Member):
+        self._register_member(server, member)
         return self.db[str(server.id)][str(member.id)]
 
     def get_server(self, server: discord.Guild):
@@ -40,7 +40,7 @@ class Database(commands.Cog):
     def add_symbol(
         self, server: discord.Guild, member: discord.Member, symbol: str, count: int = 1
     ):
-        user_db = self.get_member(server, member)
+        user_db = self._get_member(server, member)
         if symbol in user_db.keys():
             user_db[symbol] += count
         else:
@@ -48,25 +48,25 @@ class Database(commands.Cog):
         self.save()
 
     def get_symbol(self, server: discord.Guild, member: discord.Member, symbol: str):
-        user_db = self.get_member(server, member)
+        user_db = self._get_member(server, member)
         return user_db.get(symbol, 0)
     
     def reset_cooldown(
         self, server: discord.Guild, member: discord.Member, cooldown: int = 600
     ):
-        user_db = self.get_member(server, member)
+        user_db = self._get_member(server, member)
         user_db["cooldown"] = time.time() + cooldown
         self.save()
 
     def on_cooldown(self, server: discord.Guild, member: discord.Member):
-        user_db = self.get_member(server, member)
+        user_db = self._get_member(server, member)
         if "cooldown" in user_db.keys():
             return user_db["cooldown"] > time.time()
         else:
             return False
 
     def get_cooldown_end(self, server: discord.Guild, member: discord.Member):
-        user_db = self.get_member(server, member)
+        user_db = self._get_member(server, member)
         if "cooldown" in user_db.keys():
             return user_db["cooldown"]
         else:
@@ -75,7 +75,7 @@ class Database(commands.Cog):
     def has_symbol(
         self, server: discord.Guild, member: discord.Member, symbol: str, count: int = 1
     ):
-        user_db = self.get_member(server, member)
+        user_db = self._get_member(server, member)
         return symbol in user_db.keys() and user_db[symbol] >= count
 
     @commands.hybrid_command()
@@ -88,5 +88,5 @@ class Database(commands.Cog):
 
 async def setup(bot: commands.Bot):
     database = Database(bot)
-    database.load()
+    database._load()
     await bot.add_cog(database)

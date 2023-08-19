@@ -24,7 +24,7 @@ class Achievements(commands.Cog):
 
     def register(self, guild: discord.Guild, member: discord.Member):
         database: "Database" = self.bot.get_cog("Database")
-        user_db = database.get_member(guild, member)
+        user_db = database._get_member(guild, member)
         if "achs" not in user_db.keys():
             user_db["achs"] = {}
         database.save()
@@ -32,7 +32,7 @@ class Achievements(commands.Cog):
     def has_ach(self, guild: discord.Guild, member: discord.Member, ach: str):
         self.register(guild, member)
         database: "Database" = self.bot.get_cog("Database")
-        user_db = database.get_member(guild, member)["achs"]
+        user_db = database._get_member(guild, member)["achs"]
         if ach not in user_db.keys():
             return False
         return user_db[ach]
@@ -48,7 +48,7 @@ class Achievements(commands.Cog):
         self.register(guild, member)
         database: "Database" = self.bot.get_cog("Database")
         new_ach = not self.has_ach(guild, member, ach)
-        database.get_member(guild, member)["achs"][ach] = True
+        database._get_member(guild, member)["achs"][ach] = True
         database.save()
         ach_data = self.achievements[category][ach]
         if new_ach:
