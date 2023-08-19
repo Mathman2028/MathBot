@@ -110,8 +110,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
         achievements = self.bot.get_cog("Achievements")
         if member is None:
             member = ctx.author
-        user = database.get_member(ctx.guild, member)
-        discovered = len(set(SYMBOLS) & set(user.keys()))
+        discovered = len(None for i in SYMBOLS if database.has_symbol(ctx.guild, member, i, 0)) # not having 0 of a symbol = not discovered
         if discovered == len(SYMBOLS):
             await achievements.give_ach(
                 ctx.guild, member, "Symbols", "everything", ctx.channel
@@ -124,8 +123,9 @@ class Symbols(commands.GroupCog, group_name="symbol"):
         value = 0
         for i in SYMBOLS:
             if database.has_symbol(ctx.guild, member, i):
-                embed.add_field(name=i, value=user[i])
-                value += VALUES[i] * user[i]
+                amt = database.get_symbol(i)
+                embed.add_field(name=i, value=amt)
+                value += VALUES[i] * amt
         embed.set_footer(text=f"Total value: {value}")
         await ctx.send(embed=embed)
 
@@ -139,9 +139,8 @@ class Symbols(commands.GroupCog, group_name="symbol"):
             if database.has_symbol(ctx.guild, ctx.author, i):
                 pool += (BONUS_UNLOCKS[i],)
         if database.on_cooldown(ctx.guild, ctx.author):
-            user = database.get_member(ctx.guild, ctx.author)
             await ctx.send(
-                f"You're on cooldown! Try again <t:{str(math.ceil(user['cooldown']))}:R>."
+                f"You're on cooldown! Try again <t:{str(math.ceil(database.get_cooldown_end(ctx.guild, ctx.author)))}:R>."
             )
         else:
             database.reset_cooldown(ctx.guild, ctx.author)
@@ -197,9 +196,8 @@ class Symbols(commands.GroupCog, group_name="symbol"):
         else:
             await ctx.send("I couldn't find that recipe.")
             return
-        user = database.get_member(ctx.guild, ctx.author)
-        user[sym1] -= amt
-        user[sym2] -= amt
+        database.add_symbol(ctx.guild, ctx.author, sym1, -amt)
+        database.add_symbol(ctx.guild, ctx.author, sym2, -amt)
         database.add_symbol(ctx.guild, ctx.author, result, amt)
         await ctx.send(f"You got {result} x{amt}!")
         await achievements.give_ach(
@@ -218,10 +216,9 @@ class Symbols(commands.GroupCog, group_name="symbol"):
         """Tells you what can be crafted with or to make a certain symbol"""
         database: "Database" = self.bot.get_cog("Database")
         output = ""
-        user_db = database.get_member(ctx.guild, ctx.author)
 
         async def process_symbol(symbol):
-            if symbol in user_db.keys():
+            if database.has_symbol(ctx.guild, ctx.author, symbol, 0): # this checks if the symbol is discovered
                 return symbol
             else:
                 return "???"
@@ -243,12 +240,11 @@ class Symbols(commands.GroupCog, group_name="symbol"):
         """Shows a list of recipes you should try next"""
         database: "Database" = self.bot.get_cog("Database")
         output = ""
-        user_db = database.get_member(ctx.guild, ctx.author)
         for k, v in RECIPES.items():
             if (
-                k[0] in user_db.keys()
-                and k[1] in user_db.keys()
-                and v not in user_db.keys()
+                database.has_symbol(ctx.guild, ctx.author, k[0], 0) # check for 0 of a symbol = discovered the symbol
+                and database.has_symbol(ctx.guild, ctx.author, k[1], 0)
+                and not database.has_symbol(ctx.guild, ctx.author, v, 0)
             ):
                 output += f"{k[0]} + {k[1]}\n"
         output = "Nothing." if not output else output
@@ -283,8 +279,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
                 ctx.guild, ctx.author, "Random", "nofriends", ctx.channel
             )
             return
-        user = database.get_member(ctx.guild, ctx.author)
-        user[symbol] -= amount
+        database.add_symbol(ctx.guild, ctx.author, symbol, -amount)
         database.add_symbol(ctx.guild, reciever, symbol, amount)
         await ctx.send(
             embed=discord.Embed(
@@ -306,8 +301,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
             return
         if not database.has_symbol(ctx.guild, ctx.author, symbol, amount):
             await ctx.send("You don't have enough!")
-        user = database.get_member(ctx.guild, ctx.author)
-        user[symbol] -= amount
+        database.add_symbol(ctx.guild, ctx.member, symbol, -amount)
         value = VALUES[symbol] * amount * -1
         output = ""
         for _ in range(amount - 1):
@@ -393,14 +387,12 @@ class Symbols(commands.GroupCog, group_name="symbol"):
                     )
                     return
 
-                person1db = database.get_member(interaction.guild, person1)
-                person2db = database.get_member(interaction.guild, person2)
                 for k, v in person1offer.items():
                     database.add_symbol(interaction.guild, person2, k, v)
-                    person1db[k] -= v
+                    database.add_symbol(interaction.guild, person1, k, -v)
                 for k, v in person2offer.items():
                     database.add_symbol(interaction.guild, person1, k, v)
-                    person2db[k] -= v
+                    database.add_symbol(interaction.guild, person2, k, -v)
                 database.save()
 
                 await interaction.message.edit(
@@ -563,7 +555,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
             app_commands.Choice(
                 name=symbol
                 + " (x"
-                + str(database.get_member(interaction.guild, interaction.user)[symbol])
+                + str(database.get_symbol(interaction.guild, interaction.user, symbol))
                 + ")",
                 value=symbol,
             )
