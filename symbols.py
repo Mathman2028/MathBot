@@ -561,9 +561,9 @@ class Symbols(commands.GroupCog, group_name="symbol"):
         top_10 = sorted_users[:min(len(values), 10)]
         embed = discord.Embed(color=discord.Color.brand_green(), title="Value Leaderboard")
         for i, v in enumerate(top_10):
-            embed.add_field(name=f"{i + 1}. {(await self.bot.fetch_user(v)).name}", value=str(values[v]))
+            embed.add_field(name=f"{i + 1}. {(await self.bot.fetch_user(v)).name}", value=str(values[v]), inline=False)
         if ctx.author.id not in top_10:
-            embed.add_field(name=f"{sorted_users.index(ctx.author.id) + 1}. <@{ctx.author.name}>", value=values[ctx.author.id])
+            embed.add_field(name=f"{sorted_users.index(ctx.author.id) + 1}. <@{ctx.author.name}>", value=values[ctx.author.id], inline=False)
         await ctx.send(embed=embed)
         
             
