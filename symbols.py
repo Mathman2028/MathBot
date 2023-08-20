@@ -110,7 +110,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
         achievements = self.bot.get_cog("Achievements")
         if member is None:
             member = ctx.author
-        discovered = len(None for i in SYMBOLS if database.has_symbol(ctx.guild, member, i, 0)) # not having 0 of a symbol = not discovered
+        discovered = len(tuple(None for i in SYMBOLS if database.has_symbol(ctx.guild, member, i, 0))) # not having 0 of a symbol = not discovered
         if discovered == len(SYMBOLS):
             await achievements.give_ach(
                 ctx.guild, member, "Symbols", "everything", ctx.channel
@@ -123,7 +123,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
         value = 0
         for i in SYMBOLS:
             if database.has_symbol(ctx.guild, member, i):
-                amt = database.get_symbol(i)
+                amt = database.get_symbol(ctx.guild, member, i)
                 embed.add_field(name=i, value=amt)
                 value += VALUES[i] * amt
         embed.set_footer(text=f"Total value: {value}")
