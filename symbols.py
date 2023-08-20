@@ -542,6 +542,29 @@ class Symbols(commands.GroupCog, group_name="symbol"):
             return
         database.add_symbol(ctx.guild, ctx.author, symbol, count)
         await ctx.send("ok")
+        
+    @commands.hybrid_command()
+    async def leaderboard(self, ctx: commands.Context):
+        database: "Database" = self.bot.get_cog("Database")
+        server_db = database.get_server(ctx.guild)
+        values = {}
+        for i in server_db:
+            if not i.isdigit():
+                continue
+            user_id = int(i)
+            values[user_id] = 0
+            for j in SYMBOLS:
+                values[user_id] += server_db[i].get(j, 0)
+        sorted_users = sorted(tuple(values), key=lambda x: values[x], reverse=True)
+        top_10 = sorted_users[:min(len(values), 10)]
+        embed = discord.Embed(color=discord.Color.brand_green(), title="Value Leaderboard")
+        for i, v in enumerate(top_10):
+            embed.add_field(name=f"{i + 1}. {(await self.bot.fetch_user(v)).name}", value=str(values[v]))
+        if ctx.author.id not in top_10:
+            embed.add_field(name=f"{sorted_users.index(ctx.author.id) + 1}. <@{ctx.author.name}>", value=values[ctx.author.id])
+        await ctx.send(embed=embed)
+        
+            
 
     @craft.autocomplete("sym1")
     @craft.autocomplete("sym2")
