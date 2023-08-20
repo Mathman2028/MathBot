@@ -518,7 +518,7 @@ asyncio.run(bot.load_extension("symbols"))
 asyncio.run(bot.load_extension("achievements"))
 asyncio.run(bot.load_extension("database"))
 
-bot.get_cog("Database").load()
+bot.get_cog("Database")._load()
 bot.get_cog("Achievements").load()
 
 
