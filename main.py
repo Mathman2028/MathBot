@@ -561,7 +561,4 @@ async def on_app_command_error(interaction: discord.Interaction, error: Exceptio
 
 bot.on_command_error = on_command_error
 
-try:
-    bot.run(TOKEN)
-finally:
-    bot.get_cog("Database").save()
+bot.run(TOKEN)
