@@ -53,6 +53,14 @@ RECIPES = {
     ("Set", "Multiplication"): "Intersection",
     ("Real Numbers", "Real Numbers"): "Ordered Pair",
     ("Set", "Ordered Pair"): "Function",
+    ("Ordered Pair", "Real Numbers"): "X-Axis",
+    ("Ordered Pair", "Imaginary Numbers"): "Y-Axis",
+    ("Circle", "Function"): "Trig Function",
+    ("Trig Function", "X-Axis"): "Cosine",
+    ("Trig Function", "Y-Axis"): "Sine",
+    ("Trig Function", "Division"): "Tangent",
+    ("Reciprocal", "Cosine"): "Secant",
+    ("Reciprocal", "Sine"): "Cosecant",
 }
 
 BASE_SYMBOLS = ("One", "Increment", "Inverse")
@@ -303,7 +311,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
             return
         if not database.has_symbol(ctx.guild, ctx.author, symbol, amount):
             await ctx.send("You don't have enough!")
-        database.add_symbol(ctx.guild, ctx.member, symbol, -amount)
+        database.add_symbol(ctx.guild, ctx.author, symbol, -amount)
         value = VALUES[symbol] * amount * -1
         output = ""
         for _ in range(amount - 1):

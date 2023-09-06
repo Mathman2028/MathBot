@@ -202,7 +202,7 @@ async def msg_quote(interaction: discord.Interaction, message: discord.Message):
             description=message.content,
         )
     )
-    await database.save()
+    database.save()
 
 
 @bot.hybrid_command()
