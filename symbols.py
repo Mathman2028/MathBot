@@ -115,7 +115,7 @@ class Symbols(commands.GroupCog, group_name="symbol"):
     async def inv(self, ctx: commands.Context, member: discord.Member | None):
         """Displays your inventory"""
         if ctx.interaction:
-            ctx.interaction.response.defer()
+            await ctx.interaction.response.defer()
         database: "Database" = self.bot.get_cog("Database")
         achievements = self.bot.get_cog("Achievements")
         if member is None:
