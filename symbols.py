@@ -53,14 +53,18 @@ RECIPES = {
     ("Set", "Multiplication"): "Intersection",
     ("Real Numbers", "Real Numbers"): "Ordered Pair",
     ("Set", "Ordered Pair"): "Function",
-    ("Ordered Pair", "Real Numbers"): "X-Axis",
-    ("Ordered Pair", "Imaginary Numbers"): "Y-Axis",
+    ("Ordered Pair", "Point"): "Cartesian Plane",
+    ("Cartesian Plane", "Real Numbers"): "X-Axis",
+    ("Cartesian Plane", "Imaginary Numbers"): "Y-Axis",
     ("Circle", "Function"): "Trig Function",
     ("Trig Function", "X-Axis"): "Cosine",
     ("Trig Function", "Y-Axis"): "Sine",
     ("Trig Function", "Division"): "Tangent",
     ("Reciprocal", "Cosine"): "Secant",
     ("Reciprocal", "Sine"): "Cosecant",
+    ("Line", "Division"): "Slope",
+    ("Slope", "Function"): "Derivative",
+    ("Derivative", "Inverse"): "Integral"
 }
 
 BASE_SYMBOLS = ("One", "Increment", "Inverse")
