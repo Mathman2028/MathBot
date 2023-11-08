@@ -265,13 +265,46 @@ async def playchess(ctx: commands.Context, opponent: discord.Member):
     game_over = False
 
     async def process_board(board: chess.Board) -> str:
-        EMPTY = "⊙"
         final = ""
+        emojis = {
+            "bbb": "<:bbb:1171646272487301171>",
+            "bbw": "<:bbw:1171646303361576990>",
+            "bkb": "<:bkb:1171646321912987739>",
+            "bkw": "<:bkw:1171646336953753680>",
+            "bnb": "<:bnw:1171646368788516934>",
+            "bnw": "<:bnb:1171646355589042297>",
+            "bpb": "<:bpb:1171646387952287834>",
+            "bpw": "<:bpw:1171646409565556767>",
+            "bqb": "<:bqb:1171646426695077968>",
+            "bqw": "<:bqw:1171646444206293072>",
+            "brb": "<:brb:1171646462040485988>",
+            "brw": "<:brw:1171646483876024411>",
+            "eb": "<:ebs:1171647294223958056>",
+            "ew": "<:ews:1171647312234299462>",
+            "wbb": "<:wbb:1171646523612872744>",
+            "wbw": "<:wbw:1171646538901098597>",
+            "wkb": "<:wkb:1171646554063507506>",
+            "wkw": "<:wkw:1171646570203189329>",
+            "wnb": "<:wnb:1171646585650810880>",
+            "wnw": "<:wnw:1171646601991823410>",
+            "wpb": "<:wpb:1171646616378286141>",
+            "wpw": "<:wpw:1171646633897906176>",
+            "wqb": "<:wqb:1171646656182222848>",
+            "wqw": "<:wqw:1171646674368729108>",
+            "wrb": "<:wrb:1171646691259199548>",
+            "wrw": "<:wrw:1171646705872146482>",
+        }
         for rank in range(7, -1, -1):
             rank_str = ""
             for file in range(8):
                 piece = board.piece_at(chess.square(file, rank))
-                rank_str += piece.unicode_symbol() if piece is not None else EMPTY
+                square_color = "bw"[(file + rank) % 2]
+                if piece is None:
+                    rank_str += emojis["e" + square_color]
+                else:
+                    piece_symbol = piece.symbol().lower()
+                    piece_color = "bw"[piece.color]
+                    rank_str += emojis[piece_color + piece_symbol + square_color]
             final += rank_str + "\n"
         return final
 
@@ -321,10 +354,10 @@ async def playchess(ctx: commands.Context, opponent: discord.Member):
         embed = discord.Embed(
             color=0x000000 if board.turn == chess.BLACK else 0xFFFFFF,
             title=f"Chess game",
-            description=f"{white.name} plays white (uppercase), {black.name} plays black (lowercase)",
+            description=await process_board(board)
         )
         embed.add_field(
-            name="Board", value=f"```\n{await process_board(board)}\n```", inline=False
+            name="Players", value=f"{white.name} plays white (uppercase), {black.name} plays black (lowercase)", inline=False
         )
         view = ui.View(timeout=3 * 3600)
         move_button = ui.Button(
