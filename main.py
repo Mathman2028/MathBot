@@ -236,7 +236,7 @@ async def quote(ctx: commands.Context, choose: typing.Literal["random", "list"])
             description=random_quote["content"],
         )
         if "time" in random_quote.keys():
-            embed.set_footer(text=f"{str(datetime.datetime.fromtimestamp(random_quote['time']))}")
+            embed.set_footer(text=str(datetime.datetime.fromtimestamp(random_quote['time'])))
         await ctx.send(embed=embed)
 
 
@@ -295,7 +295,7 @@ async def playchess(ctx: commands.Context, opponent: discord.Member):
             "wrw": "<:wrw:1171646705872146482>",
         }
         for rank in range(7, -1, -1):
-            rank_str = ""
+            rank_str = str(rank + 1) + "\N{COMBINING ENCLOSING KEYCAP}"
             for file in range(8):
                 piece = board.piece_at(chess.square(file, rank))
                 square_color = "bw"[(file + rank) % 2]
@@ -306,7 +306,7 @@ async def playchess(ctx: commands.Context, opponent: discord.Member):
                     piece_color = "bw"[piece.color]
                     rank_str += emojis[piece_color + piece_symbol + square_color]
             final += rank_str + "\n"
-        return final
+        return final + "❌🇦​🇧​🇨​🇩​🇪​🇫​🇬​🇭"
 
     class ChessModal(ui.Modal):
         def __init__(self):
