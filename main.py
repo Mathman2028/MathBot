@@ -173,7 +173,7 @@ async def easter_eggs(message: discord.Message):
                     "friendlyfire",
                     message.channel,
                 )
-    if re.search("\d+\.\d+\.\d+\.\d+", message.content):
+    if re.search(r"\d+\.\d+\.\d+\.\d+", message.content):
         await message.reply(
             f"{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}"
         )
